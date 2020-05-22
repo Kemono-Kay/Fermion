@@ -4,7 +4,7 @@
   <meta charset='utf-8'>
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
   <title>Fermion</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+  <meta http-equiv='Content-Security-Policy' content="default-src 'self'">
   <meta name='viewport' content='width=device-width, initial-scale=1'>
   <link rel='stylesheet' type='text/css' media='screen' href='styles/default.css'>
   <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
@@ -14,114 +14,160 @@
   <div id='title-bar'>
     <div id='title-bar-handle'><span>F</span><span>ermion</span></div>
     <div id='title-bar-controls'>
-      <button id='minimize-button' title='Minimize'><span class="far fa-window-minimize"></span></button><button id='maximize-button' title='Maximize'><span class="far fa-window-maximize"></span></button><button id='close-button' title='Close'><span class="far fa-window-close"></span></button>
+      <button id='minimize-button' title='Minimize'><span class='far fa-window-minimize'></span></button><button id='maximize-button' title='Maximize'><span class='far fa-window-maximize'></span></button><button id='close-button' title='Close'><span class='far fa-window-close'></span></button>
     </div>
   </div>
-  <!--<div id='tool-bar' style="font-size:24pt;padding-left:32px;">
+  <!--<div id='tool-bar' style='font-size:24pt;padding-left:32px;'>
     😀😀😀😀😀
-    <br/><span class="fas fa-sign-out-alt"></span> sign out
-    <br/><span class="fas fa-sign-in-alt"></span> sign in
-    <br/><span class="fas fa-download"></span> update
-    <br/><span class="fas fa-sliders-h"></span> settings1
-    <br/><span class="fas fa-wrench"></span> settings2
-    <br/><span class="fas fa-list"></span> settings3
-    <br/><span class="fas fa-question-circle"></span> help
+    <br/><span class='fas fa-sign-out-alt'></span> sign out
+    <br/><span class='fas fa-sign-in-alt'></span> sign in
+    <br/><span class='fas fa-download'></span> update
+    <br/><span class='fas fa-sliders-h'></span> settings1
+    <br/><span class='fas fa-wrench'></span> settings2
+    <br/><span class='fas fa-list'></span> settings3
+    <br/><span class='fas fa-question-circle'></span> help
     <br/>
-    <br/><span class="fas fa-bookmark"></span> bookmark1
-    <br/><span class="fas fa-user-tag"></span> bookmark2
-    <br/><span class="fas fa-user-slash"></span> ignore
-    <br/><span class="fas fa-user-edit"></span> open pm
-    <br/><span class="fas fa-user-times"></span> ban
-    <br/><span class="fas fa-user-clock"></span> kick
-    <br/><span class="fas fa-user-shield"></span> promote
-    <br/><span class="fas fa-user-edit"></span> group/memo/etc.
-    <br/><span class="fas fa-user-plus"></span> invite
-    <br/><span class="fas fa-user-check"></span> add friend
-    <br/><span class="fas fa-user-cog"></span> settings
-    <br/><span class="fas fa-user-circle"></span> profile
+    <br/><span class='fas fa-bookmark'></span> bookmark1
+    <br/><span class='fas fa-user-tag'></span> bookmark2
+    <br/><span class='fas fa-user-slash'></span> ignore
+    <br/><span class='fas fa-user-edit'></span> open pm
+    <br/><span class='fas fa-user-times'></span> ban
+    <br/><span class='fas fa-user-clock'></span> kick
+    <br/><span class='fas fa-user-shield'></span> promote
+    <br/><span class='fas fa-user-edit'></span> group/memo/etc.
+    <br/><span class='fas fa-user-plus'></span> invite
+    <br/><span class='fas fa-user-check'></span> add friend
+    <br/><span class='fas fa-user-cog'></span> settings
+    <br/><span class='fas fa-user-circle'></span> profile
     <br/>
-    <br/><span class="fas fa-external-link-alt"></span> link
-    <br/><span class="fas fa-envelope-open"></span> unanswered reply
-    <br/><span class="fas fa-envelope"></span> unseen reply
-    <br/><span class="fas fa-comment-dots"></span> typing
+    <br/><span class='fas fa-external-link-alt'></span> link
+    <br/><span class='fas fa-envelope-open'></span> unanswered reply
+    <br/><span class='fas fa-envelope'></span> unseen reply
+    <br/><span class='fas fa-comment-dots'></span> typing
     <br/>
-    <br/><span class="fas fa-folder"></span> closed folder
-    <br/><span class="fas fa-folder-open"></span> open folder
+    <br/><span class='fas fa-folder'></span> closed folder
+    <br/><span class='fas fa-folder-open'></span> open folder
     <br/>
-    <br/><span class="fas fa-paper-plane"></span> send
-    <br/><span class="fas fa-comments"></span> chat
-    <br/><span class="fas fa-newspaper"></span> ads
-    <br/><span class="fas fa-at"></span> send ticket
-    <br/><span class="fas fa-copy"></span> logs1
-    <br/><span class="fas fa-history"></span> logs2
-    <br/><span class="fas fa-search"></span> search
+    <br/><span class='fas fa-paper-plane'></span> send
+    <br/><span class='fas fa-comments'></span> chat
+    <br/><span class='fas fa-newspaper'></span> ads
+    <br/><span class='fas fa-at'></span> send ticket
+    <br/><span class='fas fa-copy'></span> logs1
+    <br/><span class='fas fa-history'></span> logs2
+    <br/><span class='fas fa-search'></span> search
     <br/>
-    <br/><span class="fas fa-sort-numeric-up-alt"></span> sort
-    <br/><span class="fas fa-sort-numeric-down-alt"></span> sort
-    <br/><span class="fas fa-sort-alpha-up-alt"></span> sort
-    <br/><span class="fas fa-sort-alpha-down-alt"></span> sort
-    <br/><span class="fas fa-sort-amount-up"></span> sort
-    <br/><span class="fas fa-sort-amount-down"></span> sort
-    <br/><span class="fas fa-filter"></span> filter
+    <br/><span class='fas fa-sort-numeric-up-alt'></span> sort
+    <br/><span class='fas fa-sort-numeric-down-alt'></span> sort
+    <br/><span class='fas fa-sort-alpha-up-alt'></span> sort
+    <br/><span class='fas fa-sort-alpha-down-alt'></span> sort
+    <br/><span class='fas fa-sort-amount-up'></span> sort
+    <br/><span class='fas fa-sort-amount-down'></span> sort
+    <br/><span class='fas fa-filter'></span> filter
     <br/>
-    <br/><span class="fas fa-eye"></span> looking
-    <br/><span class="fas fa-user"></span> online
-    <br/><span class="fas fa-minus-circle"></span> do not disturb
-    <br/><span class="fas fa-clock"></span> idle1
-    <br/><span class="fas fa-hourglass-half"></span> idle2/busy2
-    <br/><span class="fas fa-crown"></span> crown
-    <br/><span class="fas fa-power-off"></span> away1
-    <br/><span class="fas fa-circle"></span> away2
-    <br/><span class="fas fa-cog"></span> busy1
+    <br/><span class='fas fa-eye'></span> looking
+    <br/><span class='fas fa-user'></span> online
+    <br/><span class='fas fa-minus-circle'></span> do not disturb
+    <br/><span class='fas fa-clock'></span> idle1
+    <br/><span class='fas fa-hourglass-half'></span> idle2/busy2
+    <br/><span class='fas fa-crown'></span> crown
+    <br/><span class='fas fa-power-off'></span> away1
+    <br/><span class='fas fa-circle'></span> away2
+    <br/><span class='fas fa-cog'></span> busy1
     <br/>
-    <br/><span class="fas fa-shield-alt"></span> moderator
-    <br/><span class="fas fa-lock"></span> admin
-    <br/><span class="fas fa-key"></span> owner
+    <br/><span class='fas fa-shield-alt'></span> moderator
+    <br/><span class='fas fa-lock'></span> admin
+    <br/><span class='fas fa-key'></span> owner
     <br/>
-    <br/><span class="fas fa-hashtag"></span> channel
+    <br/><span class='fas fa-hashtag'></span> channel
     <br/>
-    <br/><span class="fas fa-eye-dropper"></span> color1
-    <br/><span class="fas fa-fill"></span> color2
-    <br/><span class="fas fa-paint-brush"></span> color3
-    <br/><span class="fas fa-adjust"></span> color4
-    <br/><span class="fas fa-bold"></span> bold
-    <br/><span class="fas fa-italic"></span> italic
-    <br/><span class="fas fa-underline"></span> underline
-    <br/><span class="fas fa-strikethrough"></span> strikethrough
-    <br/><span class="fas fa-superscript"></span> superscript
-    <br/><span class="fas fa-subscript"></span> subscript
-    <br/><span class="fas fa-link"></span> url
-    <br/><span class="fas fa-tag"></span> user
-    <br/><span class="fas fa-portrait"></span> icon
-    <br/><span class="fas fa-user-circle"></span> icon
-    <br/><span class="fas fa-image"></span> eicon/emoji1
-    <br/><span class="fas fa-smile"></span> eicon/emoji2
-    <br/><span class="fas fa-comment-slash"></span> noparse
+    <br/><span class='fas fa-eye-dropper'></span> color1
+    <br/><span class='fas fa-fill'></span> color2
+    <br/><span class='fas fa-paint-brush'></span> color3
+    <br/><span class='fas fa-adjust'></span> color4
+    <br/><span class='fas fa-bold'></span> bold
+    <br/><span class='fas fa-italic'></span> italic
+    <br/><span class='fas fa-underline'></span> underline
+    <br/><span class='fas fa-strikethrough'></span> strikethrough
+    <br/><span class='fas fa-superscript'></span> superscript
+    <br/><span class='fas fa-subscript'></span> subscript
+    <br/><span class='fas fa-link'></span> url
+    <br/><span class='fas fa-tag'></span> user
+    <br/><span class='fas fa-portrait'></span> icon
+    <br/><span class='fas fa-user-circle'></span> icon
+    <br/><span class='fas fa-image'></span> eicon/emoji1
+    <br/><span class='fas fa-smile'></span> eicon/emoji2
+    <br/><span class='fas fa-comment-slash'></span> noparse
     <br/>
-    <br/><span class="fas fa-dice-d20"></span> roll
-    <br/><span class="fas fa-wine-bottle"></span> bottle spin
+    <br/><span class='fas fa-dice-d20'></span> roll
+    <br/><span class='fas fa-wine-bottle'></span> bottle spin
     <br/>
-    <br/><span class="fas fa-code"></span> bbcode
-    <br/><span class="fas fa-keyboard"></span> wysiwyg
+    <br/><span class='fas fa-code'></span> bbcode
+    <br/><span class='fas fa-keyboard'></span> wysiwyg
   </div>-->
   <div id='main'>
-    <div id='toolbar'>toolbar</div>
-    <div id='channels'>channels</div>
+    <div id='toolbar'>
+      <ul>
+        <li class='toolbar-section'><button title='Credentials'><span class='fas fa-id-card'></span></button><button title='Connect'><span class='fas fa-sign-in-alt'></span></button><button title='Disonnect'><span class='fas fa-sign-out-alt'></span></button></li>
+      </ul>
+    </div>
+    <div id='channels'>
+      <ul id='top-content'>
+        <li><hr/></li>
+        <li>
+          <button class='default-channel'><span class='fas fa-home'></span> Home</button>
+        </li>
+        <li>
+          <button class='default-channel'><span class='fas fa-history'></span> Conversation History</button>
+        </li>
+        <li>
+          <button class='default-channel'><span class='fas fa-sliders-h'></span> Settings</button>
+        </li>
+        <li><hr/></li>
+        <li>
+          <button class='folder'><span class='fas fa-folder-open'></span> Messages</button>
+          <ul class='folder-contents'>
+            <li>
+              <button class='folder'><span class='fas fa-folder-open'></span> Friends</button>
+              <ul class='folder-contents'>
+                <li>
+                  <button class='user'><div class='channeluserav'></div>&nbsp;Farys Scarlet</button>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <button class='folder'><span class='fas fa-folder-open'></span> Channels</button>
+          <button class='close'><span class='fas fa-ellipsis-v'></span></button>
+          <ul class='folder-contents'>
+            <li>
+              <button class='channel'><span class='fas fa-align-left'></span> Frontpage</button>
+              <button class='close'><span class='fas fa-times'></span></button>
+            </li>
+            <li>
+              <button class='channel'><span class='fas fa-align-left'></span> Fermion Support</button>
+              <button class='close'><span class='fas fa-sliders-h'></span></button>
+            </li>
+          </ul>
+        </li>
+        <li><hr/></li>
+      </ul>
+    </div>
     <div id='chat'>chat</div>
     <div id='users'>users</div>
-    <div id='status'>status</div>
-    <div id='text'>text</div>
-    <!--<div id='chat-and-status'>
-      <div id='chat-and-channels'>
-        <div id='channels'></div>
-        <div id='chat'></div>
+    <div id='status'>
+      <div id='userav'>
+        <div id='userstatusicon'>
+          <span class='fas fa-eye'></span>
+        </div>
       </div>
-      <div id='status-and-text'>
-        <div id='status'></div>
-        <div id='text'></div>
+      <div id='userinfo'>
+        <div>test</div>
+        <div id='username'>Farys Scarlet</div>
+        <div id='usertoolbar'><button title='Credentials'><span class='fas fa-id-card'></span></button ><button title='Connect'><span class='fas fa-sign-in-alt'></span></button><button title='Disonnect'><span class='fas fa-sign-out-alt'></span></button></div>
       </div>
     </div>
-    <div id='users'></div>-->
+    <div id='text'>text</div>
   </div>
   <script src='../js/appWindow.js'></script>
 </body>

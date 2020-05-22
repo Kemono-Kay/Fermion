@@ -19,5 +19,11 @@ window.bridge.preferencesEventListeners.push(function () {
 })
 
 window.bridge.windowstatusEventListeners.push(function () {
-  document.getElementById('maximize-button').title = window.bridge.windowstatus === 'full' ? 'Restore Down' : 'Maximize'
+  if (window.bridge.windowstatus === 'full') {
+    document.getElementById('maximize-button').title = 'Restore Down'
+    document.querySelector('#maximize-button > span').className = 'far fa-window-restore'
+  } else {
+    document.getElementById('maximize-button').title = 'Maximize'
+    document.querySelector('#maximize-button > span').className = 'far fa-window-maximize'
+  }
 })

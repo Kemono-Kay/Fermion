@@ -1,9 +1,15 @@
 :root {
-  
+  --default-grid-left: 1fr;
+  --default-grid-right: 0fr;
+  --default-grid-text-grow: 0px;
+
   --fermion-title-text: black;
   --fermion-title-button-hover: gray;
   --fermion-title-close-hover: red;
   --fermion-title-button-text: black;
+}
+
+:root, button {
   font-size: calc(16pt * var(--fermion-scaling));
 }
 
@@ -39,58 +45,331 @@ html {
   display: inline-block;
   height: 100%;
   vertical-align: middle;
-  margin-right: -0.25em; /* Adjusts for spacing */
+  margin-right: -0.25em;
 }
 
 #main {
-  grid-template-columns: 1fr 3.5fr 1fr;
-  grid-template-rows: calc(40px * var(--fermion-scaling)) auto calc(100px * var(--fermion-scaling));
-}
-
-#main > div {
-  border: 1px solid black;
+  padding: 0 8px 8px 8px;
+  grid-template-columns: 
+    [left] var(--default-grid-left) [chanchat] var(--default-grid-right)
+    [stattext] 3.5fr [chatuser] 1fr [right];
+  grid-template-rows:
+    [top] calc(40px * var(--fermion-scaling)) 
+    [toolchat] auto [chattext] var(--default-grid-text-grow)
+    [chatstat] calc(100px * var(--fermion-scaling)) [bottom];
 }
 
 #toolbar {
-  grid-column-start: 1;
-  grid-column-end: 4;
-  grid-row-start: 1;
-  grid-row-end: 2;
+  grid-column-start: left;
+  grid-column-end: right;
+  grid-row-start: top;
+  grid-row-end: toolchat;
 }
 
 #channels {
   min-width: calc(300px * var(--fermion-scaling));
-  grid-column-start: 1;
-  grid-column-end: 2;
-  grid-row-start: 2;
-  grid-row-end: 3;
+  grid-column-start: left;
+  grid-column-end: chanchat;
+  grid-row-start: toolchat;
+  grid-row-end: chatstat;
 }
 
 #chat {
-  grid-column-start: 2;
-  grid-column-end: 3;
-  grid-row-start: 2;
-  grid-row-end: 3;
+  grid-column-start: chanchat;
+  grid-column-end: chatuser;
+  grid-row-start: toolchat;
+  grid-row-end: chattext;
 }
 
 #users {
   min-width: calc(300px * var(--fermion-scaling));
-  grid-column-start: 3;
-  grid-column-end: 4;
-  grid-row-start: 2;
-  grid-row-end: 3;
+  grid-column-start: chatuser;
+  grid-column-end: right;
+  grid-row-start: toolchat;
+  grid-row-end: chattext;
 }
 
 #status {
-  grid-column-start: 1;
-  grid-column-end: 2;
-  grid-row-start: 3;
-  grid-row-end: 4;
+  grid-column-start: left;
+  grid-column-end: stattext;
+  grid-row-start: chatstat;
+  grid-row-end: bottom;
 }
 
 #text {
-  grid-column-start: 2;
-  grid-column-end: 4;
-  grid-row-start: 3;
-  grid-row-end: 4;
+  grid-column-start: stattext;
+  grid-column-end: right;
+  grid-row-start: chattext;
+  grid-row-end: bottom;
+}
+
+
+#toolbar > ul {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.toolbar-section {
+  height:100%;
+  display: inline-block;
+}
+
+.toolbar-section:first-child:before,
+.toolbar-section:after {
+  content:'│';
+}
+
+.toolbar-section > button {
+  height:100%;
+  background: transparent;
+  border: 0;
+}
+
+.toolbar-section > button:hover {
+  background: darkgray
+}
+
+#status {
+  display: flex;
+  background: lightgray;
+  border-radius: 120px;
+  overflow: hidden;
+}
+
+#userav {
+  width: calc(100px * var(--fermion-scaling));
+  height: calc(100px * var(--fermion-scaling));
+  border-radius: calc(100px * var(--fermion-scaling));
+  background: darkgray;
+  float:left;
+  position: relative;
+  margin-right: calc(8px * var(--fermion-scaling));
+}
+
+#userstatusicon {
+  bottom: calc(-2px * var(--fermion-scaling));
+  right: calc(-2px * var( --fermion-scaling));
+  position: absolute;
+  width: calc(24px * var( --fermion-scaling));
+  height: calc(24px * var( --fermion-scaling));
+  border-radius: calc(100pt * var( --fermion-scaling));
+  background: white;
+  border: calc(4px * var( --fermion-scaling)) solid lightgray;
+  padding: 1px;
+}
+
+#userinfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: calc(4px * var(--fermion-scaling));
+  flex-grow: 1;
+  margin-left: 15px;
+}
+
+#username {
+  font-weight: bold;
+}
+
+/*#userstatus {
+  bottom: calc(2px * var(--fermion-scaling));
+}*/
+
+/*#user-swap {
+  padding: 0;
+  margin: 0;
+  height: 25%;
+  list-style: none;
+  position: relative;
+  bottom: calc(8pt * var(--fermion-scaling));
+}
+
+#user-swap li {
+  width: calc(24pt * var(--fermion-scaling));
+  height: calc(24pt * var(--fermion-scaling));
+  border-radius: calc(16pt * var(--fermion-scaling));
+  background: darkgray;
+  line-height: calc(24pt * var(--fermion-scaling));
+  text-align: center;
+  display: inline-block;
+  margin-right: calc(8pt * var(--fermion-scaling));
+}*/
+
+#usertoolbar {
+  width: 80%;
+  text-align: center;
+}
+
+#usertoolbar > button {
+  height:100%;
+  background: transparent;
+  border: 0;
+}
+
+#usertoolbar > button:hover {
+  background: darkgray;
+}
+
+#top-content > li ul {
+  list-style: none;
+  position: relative;
+  margin: 0;
+  padding-left: calc(30pt * var(--fermion-scaling));
+}
+
+/*#channels li {
+  display: block;
+  position: relative;
+  width:100%;
+  margin-left: calc(8pt * var(--fermion-scaling));
+}*/
+
+#channels li > button:first-child {
+  text-align: left;
+  display: block;
+  width:100%;
+  height: calc(32pt * var(--fermion-scaling));
+  position: relative;
+  background: 0;
+  border: 1px solid black;
+  border: 0;
+}
+#channels li > button:first-child:hover {
+  background: darkgray;
+}
+
+/*#channels ul:before {
+  content: '.';
+  width: 1px;
+  color: transparent;
+  background: black;
+  position: absolute;
+  bottom: calc(24pt * var(--fermion-scaling));
+  height: calc(100% - 24pt * var(--fermion-scaling));
+}*/
+
+
+
+
+/*#channels li:before {
+  content: '.';
+  height: 1px;
+  width: calc(8pt * var(--fermion-scaling));
+  color: transparent;
+  background: black;
+  position: absolute;
+  top: calc(24pt * var(--fermion-scaling));
+  left: calc(-8pt * var(--fermion-scaling));
+}
+
+#channels li:after {
+  content: '.';
+  width: 1px;
+  color: transparent;
+  background: black;
+  position: absolute;
+  bottom: calc(24pt * var(--fermion-scaling));
+  height: calc(100% - 24pt * var(--fermion-scaling));
+}*/
+
+
+#top-content > li li::before {
+  content: " ";
+  position: absolute;
+  width: 1px;
+  background-color: #000;
+  top: 0px;
+  bottom: calc(-16pt * var(--fermion-scaling) - 1px);
+  /* height: calc(100% - 24pt * var(--fermion-scaling)); */
+  left: calc(-16pt * var(--fermion-scaling));
+}
+
+#top-content > li li::after {
+  content: " ";
+  position: absolute;
+  left: -10px;
+  width: calc(16pt * var(--fermion-scaling));
+  height: 1px;
+  background-color: #000;
+  top: calc(16pt * var(--fermion-scaling));
+  left: calc(-16pt * var(--fermion-scaling));
+}
+
+#top-content > li li:not(:first-child):last-child::before {display: none;}
+#top-content > li li:only-child::before {
+  height: calc(16pt * var(--fermion-scaling));
+}
+
+#top-content > li li {
+  width:100%;
+  display: block;
+  position: relative;
+  /*margin-left: calc(8pt * var(--fermion-scaling));*/
+}
+
+#top-content {
+  list-style: none;
+  /*margin: calc(4px * var(--fermion-scaling)) calc(16px * var(--fermion-scaling));*/
+  margin: calc(4px * var(--fermion-scaling));
+  padding-left: 0;
+}
+
+/*#top-content {
+  border: 1px solid black;
+  border-top-left-radius: calc(12pt * var(--fermion-scaling));
+  border-bottom-left-radius: calc(12pt * var(--fermion-scaling));
+  overflow: hidden;
+}
+
+#channels li:not(:last-child) {
+  border-bottom: 1px solid black;
+}
+
+#channels li button:not(:last-child) {
+  border-bottom: 1px solid black;
+} */
+
+#channels button.close {
+  background: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 0;
+  /* bottom: 0; */
+  width: calc(32pt * var(--fermion-scaling));
+  padding: 0;
+  height: calc(32pt * var(--fermion-scaling));
+}
+
+#channels button.close span {
+  line-height: calc(32pt * var(--fermion-scaling));
+  text-align: center;
+  width: 100%;
+  display: block;
+  padding: 1px 0 0 1px;
+}
+
+#channels button.close:hover {
+  background: red;
+}
+
+#channels .channeluserav {
+  background: gray;
+  width: calc(32pt * var(--fermion-scaling));
+  height: calc(32pt * var(--fermion-scaling));
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* float: left; */
+  /*border-radius: calc(24pt * var(--fermion-scaling));*/
+}
+
+#channels .user {
+  padding-left: calc(32pt * var(--fermion-scaling));
+}
+
+#channels li {
+  position: relative;
 }

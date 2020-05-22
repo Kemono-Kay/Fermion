@@ -1,0 +1,16 @@
+{
+  "name": "fermion-client",
+  "version": "1.0.0",
+  "description": "Custom F-Chat client",
+  "main": "app/index.js",
+  "scripts": {
+    "start": ".\\node_modules\\electron\\dist\\electron.exe ."
+  },
+  "author": "Kemono-Kay",
+  "license": "MITNFA",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.13.0",
+    "electron": "^9.0.0",
+    "ws": "^7.3.0"
+  }
+}

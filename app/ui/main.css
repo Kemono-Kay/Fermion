@@ -1,0 +1,48 @@
+@font-face {
+  font-family: "Noto";
+  src: url("../lib/noto/NotoColorEmoji.ttf");
+}
+
+body {
+  font-family: 'Noto', Arial, Helvetica, sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+#title-bar {
+  -webkit-app-region: drag;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  white-space: nowrap;
+}
+
+#title-bar-handle {
+  flex-grow: 1;
+  color: var(--fermion-title-text);
+}
+
+#title-bar-controls > button {
+  -webkit-app-region: no-drag;
+  color: var(--fermion-title-button-text);
+}
+
+#title-bar-controls > button:hover {
+  background: var(--fermion-title-button-hover);
+}
+
+#title-bar-controls > button:last-child:hover {
+  background: var(--fermion-title-close-hover);
+}
+
+#title-bar-handle > *:first-child {
+  display: inline-block;
+  transform: rotate(180deg);
+}
+
+#main {
+  flex-grow:1;
+  display: grid;
+}

@@ -1,4 +1,51 @@
 {
   "fontsize": 1,
-  "fontsizes": [0.5, 0.66, 0.75, 0.88, 1, 1.14, 1.26, 1.5]
+  "fontsizes": [0.5, 0.66, 0.75, 0.88, 1, 1.14, 1.26, 1.5],
+  "usergroups": {
+    "": {
+      "color": "#333333",
+      "priority": 0
+    },
+    "Friend": {
+      "color": null,
+      "priority": 0
+    },
+    "Bookmark": {
+      "color": null,
+      "priority": 0
+    },
+    "Male": {
+      "color": null,
+      "priority": 0
+    },
+    "Female": {
+      "color": null,
+      "priority": 0
+    },
+    "Transgender": {
+      "color": null,
+      "priority": 0
+    },
+    "Herm": {
+      "color": null,
+      "priority": 0
+    },
+    "Shemale": {
+      "color": null,
+      "priority": 0
+    },
+    "Male-Herm": {
+      "color": null,
+      "priority": 0
+    },
+    "Cunt-boy": {
+      "color": null,
+      "priority": 0
+    },
+    "None": {
+      "color": null,
+      "priority": 0
+    }
+  }
+
 }

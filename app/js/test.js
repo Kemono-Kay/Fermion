@@ -1,0 +1,5 @@
+var test = new Channel('TestChannel', true)
+var usr = new User('Test User', 'online')
+UI.showChannel(test)
+test.message(usr, 1234, 'Hi there!')
+test.message(usr, 1234, 'A second message!')

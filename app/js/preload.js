@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 const { ipcRenderer } = require('electron')
 
 window.bridge = {

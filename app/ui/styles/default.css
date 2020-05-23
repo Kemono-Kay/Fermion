@@ -74,7 +74,7 @@ html {
   grid-row-end: chatstat;
 }
 
-#chat {
+.Fermion-ChannelArea {
   grid-column-start: chanchat;
   grid-column-end: chatuser;
   grid-row-start: toolchat;
@@ -228,12 +228,15 @@ html {
 #channels li > button:first-child {
   text-align: left;
   display: block;
-  width:100%;
+  width: 100%;
   height: calc(32pt * var(--fermion-scaling));
   position: relative;
   background: 0;
   border: 1px solid black;
   border: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 #channels li > button:first-child:hover {
   background: darkgray;
@@ -373,3 +376,54 @@ html {
 #channels li {
   position: relative;
 }
+
+
+/*.user-link {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#chatname {
+  font-size: 120%;
+  font-weight: bold;
+}
+
+#chatmessages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chatmessage {
+  display: block;
+  margin: calc(8px * var(--fermion-scaling)) 0;
+}
+
+.-gr-Female {
+  color: red;
+}*/
+
+/** CHANNEL AREA **/
+
+.Fermion-ChannelTitle {
+  font-size: 120%;
+  font-weight: bold;
+}
+
+.Fermion-ChannelBody {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.Fermion-ChannelMessage-User {
+  font-weight: bold;
+  cursor: pointer;
+  color: red;
+}
+
+.Fermion-ChannelMessage {
+  display: block;
+  margin: calc(8px * var(--fermion-scaling)) 0;
+}
+

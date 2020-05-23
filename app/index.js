@@ -8,7 +8,7 @@ const fsConstants = require('fs').constants */
 const fs = require('fs')
 const Store = require('./js/Store')
 
-const { app, BrowserWindow, ipcMain } = electron
+const { app, BrowserWindow, ipcMain, shell } = electron
 
 let appWindow
 let config
@@ -43,6 +43,11 @@ app.on('ready', function () {
       console.error('Error occured during app launch:', err)
       app.exit(1)
     })
+  })
+
+  appWindow.webContents.on('new-window', function (e, url) {
+    e.preventDefault()
+    shell.openExternal(url)
   })
 })
 

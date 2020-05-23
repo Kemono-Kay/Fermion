@@ -7,10 +7,6 @@ function fa (name, style = 's') {
   return el
 }
 
-function formatTimestamp (unix, format) {
-
-}
-
 class User {
   constructor (cname, status) {
     this.cname = cname
@@ -85,7 +81,7 @@ class ChatMessage extends ChannelMessage {
     this.el.appendChild(textEl)
     textEl.appendChild(userEl)
 
-    timestampEl.appendChild(document.createTextNode(`[${formatTimestamp(timestamp, Preferences.get('tsFormatShort'))}]`))
+    timestampEl.appendChild(document.createTextNode(`[${formatTimestamp(Preferences.get('tsFormatShort'), timestamp)}]`))
     textEl.appendChild(document.createTextNode(`: ${text}`))
     userEl.appendChild(document.createTextNode(user.cname))
   }
@@ -93,7 +89,8 @@ class ChatMessage extends ChannelMessage {
 
 const Preferences = {
   get: function (key) {
-    return 'bla'
+    return '\\yyyy-\\mm-\\dd \\HH:\\ii:\\ss'
+    // return 'bla'
     // return window.bridge.properties[key]
   }
 }

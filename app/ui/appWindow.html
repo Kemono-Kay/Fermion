@@ -1,20 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html id='FermionApp'>
 <head>
   <meta charset='utf-8'>
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
   <title>Fermion</title>
   <meta http-equiv='Content-Security-Policy' content="default-src 'self'">
   <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <link rel='stylesheet' type='text/css' media='screen' href='styles/default.css'>
+  <link rel='stylesheet' type='text/css' media='screen' href='styles/default.css' id='FermionApp-UserTheme'>
   <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
   <link rel='stylesheet' type='text/css' media='screen' href='../../node_modules/@fortawesome/fontawesome-free/css/all.min.css'>
 </head>
 <body>
-  <div id='title-bar'>
+  <!--<div id='title-bar'>
     <div id='title-bar-handle'><span>F</span><span>ermion</span></div>
     <div id='title-bar-controls'>
       <button id='minimize-button' title='Minimize'><span class='far fa-window-minimize'></span></button><button id='maximize-button' title='Maximize'><span class='far fa-window-maximize'></span></button><button id='close-button' title='Close'><span class='far fa-window-close'></span></button>
+    </div>
+  </div>-->
+  <div class='Titlebar Main'>
+    <div class='Titlebar Handle'><span>F</span><span>ermion</span></div>
+    <div class='Titlebar Controls'>
+      <button class='Titlebar Button Minimize' title='Minimize'><span class='far fa-window-minimize'></span></button><button class='Titlebar Button Maximize' title='Maximize'><span class='far fa-window-maximize'></span></button><button class='Titlebar Button Close' title='Close'><span class='far fa-window-close'></span></button>
     </div>
   </div>
   <!--<div id='tool-bar' style='font-size:24pt;padding-left:32px;'>
@@ -104,10 +110,10 @@
     <br/><span class='fas fa-code'></span> bbcode
     <br/><span class='fas fa-keyboard'></span> wysiwyg
   </div>-->
-  <div id='main'>
-    <div id='toolbar'>
-      <ul>
-        <li class='toolbar-section'><button title='Credentials'><span class='fas fa-id-card'></span></button><button title='Connect'><span class='fas fa-sign-in-alt'></span></button><button title='Disonnect'><span class='fas fa-sign-out-alt'></span></button></li>
+  <div class='Layout Main'>
+    <div class='Toolbar Main'>
+      <ul class='Toolbar Groups'>
+        <li class='Toolbar Section'><button class='Toolbar Button' title='Credentials'><span class='fas fa-id-card'></span></button><button class='Toolbar Button' title='Connect'><span class='fas fa-sign-in-alt'></span></button><button class='Toolbar Button' title='Disonnect'><span class='fas fa-sign-out-alt'></span></button></li>
       </ul>
     </div>
     <div id='channels'>
@@ -130,7 +136,7 @@
               <button class='folder'><span class='fas fa-folder-open'></span> Friends</button>
               <ul class='folder-contents'>
                 <li>
-                  <button class='user'><div class='channeluserav'></div>&nbsp;McTestFace</button>
+                  <button class='user'><div class='channeluserav'></div>&nbsp;McTestFace😀😀</button>
                 </li>
               </ul>
             </li>
@@ -156,26 +162,7 @@
         </li>
       </ul>
     </div>
-    <div id='chat' class='Fermion-ChannelArea'>
-      <div class='Fermion-ChannelHeader'>
-        <div class='Fermion-ChannelTitle'>
-          <span class='fas fa-hashtag'></span> Fermion Support
-        </div>
-      </div>
-      <!--<div class='Fermion-ChannelBody'>-->
-        <ul class='Fermion-ChannelBody'>
-          <li class='Fermion-ChannelMessage'>
-            <span class='Fermion-ChannelMessage-Timestamp'>[dd-mm-YYYY hh:mm:ss]</span> <span class='Fermion-ChannelMessage-Body'><span class='Fermion-ChannelMessage-User'>Farys Scarlet</span>: This is a message!</span>
-          </li>
-          <li class='Fermion-ChannelMessage'>
-            <span class='Fermion-ChannelMessage-Timestamp'>[dd-mm-YYYY hh:mm:ss]</span> <span class='Fermion-ChannelMessage-Body'><span tabindex='0' class='Fermion-ChannelMessage-User' draggable='true'>Farys Scarlet</span>: This is a long message! This is a long message! This is a long message! This is a long message! This is a long message! This is a long message! This is a long message! This is a long message! This is a long message! This is a long message!</span>
-          </li>
-          <li class='Fermion-ChannelMessage'>
-            <span class='Fermion-ChannelMessage-Timestamp'>[dd-mm-YYYY hh:mm:ss]</span> <span class='Fermion-ChannelMessage-Body'><span class='Fermion-ChannelMessage-User'>Farys Scarlet</span>: This is a third message!</span>
-          </li>
-        </ul>
-      <!--</div>-->
-    </div>
+    <div class='Channel Main'></div>
     <div id='users'>users</div>
     <div id='status'>
       <div id='userav'>

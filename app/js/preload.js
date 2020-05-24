@@ -1,7 +1,6 @@
 /* eslint-env node, browser */
 
 const { ipcRenderer } = require('electron')
-
 const Awaiter = require('./Awaiter')
 
 const FermionReadyEvent = new Event('FermionReady')

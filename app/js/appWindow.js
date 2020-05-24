@@ -1,8 +1,8 @@
 /* eslint-env browser */
 
-document.getElementById('minimize-button').addEventListener('click', window.bridge.minimize)
-document.getElementById('close-button').addEventListener('click', window.bridge.close)
-document.getElementById('maximize-button').addEventListener('click', window.bridge.maximize)
+document.querySelector('.Button.Minimize').addEventListener('click', window.bridge.minimize)
+document.querySelector('.Button.Close').addEventListener('click', window.bridge.close)
+document.querySelector('.Button.Maximize').addEventListener('click', window.bridge.maximize)
 
 const styles = {}
 function updateStyles () {
@@ -20,10 +20,10 @@ window.addEventListener('FermionPreferencesUpdated', () => {
 
 window.addEventListener('FermionWindowUpdated', () => {
   if (window.bridge.windowstatus === 'full') {
-    document.getElementById('maximize-button').title = 'Restore Down'
-    document.querySelector('#maximize-button > span').className = 'far fa-window-restore'
+    document.querySelector('.Button.Maximize').title = 'Restore Down'
+    document.querySelector('.Button.Maximize > span').className = 'far fa-window-restore'
   } else {
-    document.getElementById('maximize-button').title = 'Maximize'
-    document.querySelector('#maximize-button > span').className = 'far fa-window-maximize'
+    document.querySelector('.Button.Maximize').title = 'Maximize'
+    document.querySelector('.Button.Maximize > span').className = 'far fa-window-maximize'
   }
 })

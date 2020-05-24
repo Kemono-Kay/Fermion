@@ -1,17 +1,21 @@
 @font-face {
-  font-family: "Noto";
+  font-family: "EmojiFont";
   src: url("../lib/noto/NotoColorEmoji.ttf");
 }
 
+button {
+  font-family: Helvetica, Arial, 'EmojiFont', sans-serif;
+}
+
 body {
-  font-family: Arial, 'Noto', Helvetica, sans-serif;
+  font-family: Helvetica, Arial, 'EmojiFont', sans-serif;
   margin: 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-#title-bar {
+.Titlebar.Main {
   user-select: none;
   -webkit-app-region: drag;
   width: 100%;
@@ -20,30 +24,30 @@ body {
   white-space: nowrap;
 }
 
-#title-bar-handle {
+.Titlebar.Handle {
   flex-grow: 1;
   color: var(--fermion-title-text);
 }
 
-#title-bar-controls > button {
+.Titlebar.Button {
   -webkit-app-region: no-drag;
   color: var(--fermion-title-button-text);
 }
 
-#title-bar-controls > button:hover {
+.Titlebar.Button:hover {
   background: var(--fermion-title-button-hover);
 }
 
-#title-bar-controls > button:last-child:hover {
+.Titlebar.Button.Close:hover {
   background: var(--fermion-title-close-hover);
 }
 
-#title-bar-handle > *:first-child {
+.Titlebar.Handle > *:first-child {
   display: inline-block;
   transform: rotate(180deg);
 }
 
-#main {
+.Layout.Main {
   flex-grow:1;
   display: grid;
 }

@@ -26,24 +26,28 @@ class Channel {
     this.logging = logging
 
     this.el = document.createElement('div')
-    this.el.classList.add('Fermion-ChannelArea')
+    this.el.classList.add('Channel', 'Main')
 
     const headerEl = document.createElement('div')
     const titleEl = document.createElement('div')
     const channelEl = document.createElement('ul')
 
-    headerEl.classList.add('Fermion-ChannelHeader')
-    headerEl.classList.add('Fermion-ChannelTitle')
-    channelEl.classList.add('Fermion-ChannelBody')
+    headerEl.classList.add('Channel', 'Header')
+    titleEl.classList.add('Channel', 'Title')
+    channelEl.classList.add('Channel', 'Body')
 
     this.el.appendChild(headerEl)
     headerEl.appendChild(titleEl)
     this.el.appendChild(channelEl)
 
-    titleEl.appendChild(fa('hashtag'))
+    titleEl.appendChild(fa('hashtag')) // fa('at') for user
     titleEl.appendChild(document.createTextNode(` ${name}`))
 
     this.body = channelEl
+  }
+
+  deactivate () {
+    this.messages.splice(Preferences.get('pastmessagecount') || this.messages.length)
   }
 
   message (user, timestamp, text) {
@@ -56,7 +60,7 @@ class Channel {
 class ChannelMessage {
   constructor () {
     this.el = document.createElement('li')
-    this.el.classList.add('Fermion-ChannelMessage')
+    this.el.classList.add('Message', 'Main')
   }
 }
 
@@ -71,22 +75,23 @@ class ChatMessage extends ChannelMessage {
     const textEl = document.createElement('span')
     const userEl = document.createElement('span')
 
-    timestampEl.classList.add('Fermion-ChannelMessage-Timestamp')
-    textEl.classList.add('Fermion-ChannelMessage-Body')
-    userEl.classList.add('Fermion-ChannelMessage-User')
+    timestampEl.classList.add('Message', 'Timestamp')
+    textEl.classList.add('Message', 'Body')
+    userEl.classList.add('Message', 'User')
 
     userEl.tabIndex = 0
     userEl.draggable = true
     userEl.style.color = user.getColor()
 
     this.el.appendChild(timestampEl)
+    this.el.appendChild(document.createTextNode(' '))
     this.el.appendChild(textEl)
     textEl.appendChild(userEl)
 
     timestampEl.appendChild(document.createTextNode(`[${formatTimestamp(Preferences.get('timestamptemplate').short, timestamp)}]`))
     timestampEl.setAttribute('title', `[${formatTimestamp(Preferences.get('timestamptemplate').full, timestamp)}]`)
     textEl.appendChild(document.createTextNode(`: ${text}`))
-    userEl.appendChild(document.createTextNode(` ${user.characterName}`))
+    userEl.appendChild(document.createTextNode(user.characterName))
   }
 }
 
@@ -101,6 +106,6 @@ const UI = {
 
   },
   showChannel: function (channel) {
-    document.querySelector('.Fermion-ChannelArea').replaceWith(channel.el)
+    document.querySelector('.Channel.Main').replaceWith(channel.el)
   }
 }

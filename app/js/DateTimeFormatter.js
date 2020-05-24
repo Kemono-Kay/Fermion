@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* eslint-disable no-unused-vars */
+
 function formatTimestamp (format, unixmillis = new Date().getTime()) {
   const formats = {
     yyyy: { format: { year: 'numeric' }, get: 'year' },

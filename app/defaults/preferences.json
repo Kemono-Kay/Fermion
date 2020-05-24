@@ -1,6 +1,11 @@
 {
   "fontsize": 1,
   "fontsizes": [0.5, 0.66, 0.75, 0.88, 1, 1.14, 1.26, 1.5],
+  "timestamptemplate": {
+    "short":"\\HH:\\ii",
+    "long":"\\dd \\mmm \\HH:\\ii",
+    "full":"\\yyyy-\\mm-\\dd \\HH:\\ii:\\ss"
+  },
   "usergroups": {
     "": {
       "color": "#333333",

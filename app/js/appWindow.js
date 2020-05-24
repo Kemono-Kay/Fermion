@@ -13,12 +13,12 @@ function updateStyles () {
   document.firstElementChild.style.cssText = styleText
 }
 
-window.bridge.preferencesEventListeners.push(function () {
+window.addEventListener('FermionPreferencesUpdated', () => {
   styles['--fermion-scaling'] = window.bridge.preferences.fontsizes[window.bridge.preferences.fontsize]
   updateStyles()
 })
 
-window.bridge.windowstatusEventListeners.push(function () {
+window.addEventListener('FermionWindowUpdated', () => {
   if (window.bridge.windowstatus === 'full') {
     document.getElementById('maximize-button').title = 'Restore Down'
     document.querySelector('#maximize-button > span').className = 'far fa-window-restore'

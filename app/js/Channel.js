@@ -1,4 +1,6 @@
 /* eslint-env browser */
+/* eslint-disable no-unused-vars */
+/* global formatTimestamp */
 
 function fa (name, style = 's') {
   const el = document.createElement('span')
@@ -8,8 +10,8 @@ function fa (name, style = 's') {
 }
 
 class User {
-  constructor (cname, status) {
-    this.cname = cname
+  constructor (characterName, status) {
+    this.characterName = characterName
     this.status = status || false
   }
 
@@ -81,17 +83,16 @@ class ChatMessage extends ChannelMessage {
     this.el.appendChild(textEl)
     textEl.appendChild(userEl)
 
-    timestampEl.appendChild(document.createTextNode(`[${formatTimestamp(Preferences.get('tsFormatShort'), timestamp)}]`))
+    timestampEl.appendChild(document.createTextNode(`[${formatTimestamp(Preferences.get('timestamptemplate').short, timestamp)}]`))
+    timestampEl.setAttribute('title', `[${formatTimestamp(Preferences.get('timestamptemplate').full, timestamp)}]`)
     textEl.appendChild(document.createTextNode(`: ${text}`))
-    userEl.appendChild(document.createTextNode(user.cname))
+    userEl.appendChild(document.createTextNode(` ${user.characterName}`))
   }
 }
 
 const Preferences = {
   get: function (key) {
-    return '\\yyyy-\\mm-\\dd \\HH:\\ii:\\ss'
-    // return 'bla'
-    // return window.bridge.properties[key]
+    return window.bridge.preferences[key]
   }
 }
 

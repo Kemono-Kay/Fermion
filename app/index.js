@@ -3,16 +3,30 @@
 const electron = require('electron')
 const url = require('url')
 const path = require('path')
-/* const fs = require('fs').promises
-const fsConstants = require('fs').constants */
 const fs = require('fs')
 const Store = require('./js/Store')
+const Awaiter = require('./js/Awaiter')
 
 const { app, BrowserWindow, ipcMain, shell } = electron
 
 let appWindow
 let config
 let preferences
+
+const appReadyAwaiter = new Awaiter()
+appReadyAwaiter.add('ready-to-show')
+appReadyAwaiter.add('load')
+appReadyAwaiter.add('appInit')
+appReadyAwaiter.run().then(() => {
+  appWindow.webContents.send('windowstatus', 'part')
+  preferences.enqueue((data) => {
+    appWindow.webContents.send('preferences', data)
+    appWindow.show()
+  })
+}).catch(err => {
+  console.error('Error occured during app launch:', err)
+  app.exit(1)
+})
 
 app.on('ready', function () {
   appWindow = new BrowserWindow({
@@ -28,27 +42,24 @@ app.on('ready', function () {
     protocol: 'file:',
     slashes: true
   }))
+
+  appWindow.once('ready-to-show', () => {
+    appReadyAwaiter.resolve('ready-to-show')
+  })
+
   appWindow.on('closed', function () {
     appWindow = null
     app.quit()
-  })
-
-  appWindow.once('ready-to-show', () => {
-    initApp().then(() => {
-      preferences.enqueue((data) => {
-        appWindow.webContents.send('preferences', data)
-        appWindow.show()
-      })
-    }).catch(err => {
-      console.error('Error occured during app launch:', err)
-      app.exit(1)
-    })
   })
 
   appWindow.webContents.on('new-window', function (e, url) {
     e.preventDefault()
     shell.openExternal(url)
   })
+})
+
+ipcMain.handle('load', () => {
+  appReadyAwaiter.resolve('load')
 })
 
 ipcMain.handle('window', (event, type) => {
@@ -129,23 +140,19 @@ async function initApp () {
         const newPath = path.join(...config.appdata, 'fermion-client', 'config', 'preferences.json')
         fs.access(newPath, fs.constants.F_OK, (err) => {
           if (err) {
-            console.log('file unavailable')
             // Preferences file inaccessible. Copy default file to location.
             fs.copyFile(defaultPath, newPath, (err) => {
               if (err) {
                 // Could not copy.
-                console.log('no copy')
                 reject(err)
               } else {
                 // Copy successful.
-                console.log('copied')
                 preferences = new Store(newPath)
                 resolve()
               }
             })
           } else {
             // Preferences file accessible. Create preferences object.
-            console.log('object created')
             preferences = new Store(newPath)
             resolve()
           }
@@ -164,3 +171,5 @@ async function initApp () {
     }).catch(err => reject(err))
   })
 }
+
+initApp().then(appReadyAwaiter.resolve('appInit'))

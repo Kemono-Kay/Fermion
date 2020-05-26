@@ -15,6 +15,7 @@ appReadyAwaiter.run().then(() => window.dispatchEvent(FermionReadyEvent))
 
 // Communicate back to app that the page has loaded.
 window.addEventListener('load', () => {
+  window.bridge.handleIcons()
   ipcRenderer.invoke('load')
 }, { once: true })
 
@@ -45,5 +46,21 @@ window.bridge = {
 
   maximize: function () {
     ipcRenderer.invoke('window', 'maximize')
+  },
+  handleIcons: function () {
+    document.querySelectorAll('.UnhandledIcon').forEach(el => {
+      const style = window.getComputedStyle(el)
+      el.classList.add(
+        'HandledIcon',
+        style.getPropertyValue('--fermion-icon-style').trim() || 'fas',
+        `fa-${style.getPropertyValue('--fermion-icon').trim()}`)
+      el.classList.remove('UnhandledIcon')
+    })
+  },
+  rehandleIcons: function () {
+    document.querySelectorAll('.HandledIcon').forEach(el => {
+      el.className = 'UnhandledIcon'
+    })
+    window.bridge.handleIcons()
   }
 }

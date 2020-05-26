@@ -25,25 +25,28 @@ class Channel {
     this.messages = []
     this.logging = logging
 
-    this.el = document.createElement('div')
-    this.el.classList.add('Channel', 'Main')
-
-    const headerEl = document.createElement('div')
     const titleEl = document.createElement('div')
-    const channelEl = document.createElement('ul')
-
-    headerEl.classList.add('Channel', 'Header')
     titleEl.classList.add('Channel', 'Title')
-    channelEl.classList.add('Channel', 'Body')
-
-    this.el.appendChild(headerEl)
-    headerEl.appendChild(titleEl)
-    this.el.appendChild(channelEl)
-
     titleEl.appendChild(fa('hashtag')) // fa('at') for user
     titleEl.appendChild(document.createTextNode(` ${name}`))
 
+    const controlsEl = document.createElement('div')
+    controlsEl.classList.add('Channel', 'Controls')
+    this.controls = controlsEl
+
+    const headerEl = document.createElement('div')
+    headerEl.classList.add('Channel', 'Header')
+    headerEl.appendChild(titleEl)
+    headerEl.appendChild(controlsEl)
+
+    const channelEl = document.createElement('ul')
+    channelEl.classList.add('Channel', 'Body')
     this.body = channelEl
+
+    this.el = document.createElement('div')
+    this.el.classList.add('Channel', 'Main')
+    this.el.appendChild(headerEl)
+    this.el.appendChild(channelEl)
   }
 
   deactivate () {
@@ -54,6 +57,50 @@ class Channel {
     const msg = new ChatMessage(user, timestamp, text)
     this.messages.push(msg)
     this.body.appendChild(msg.el)
+  }
+}
+
+const createControl = function (faName, name) {
+  const el = document.createElement('button')
+  el.classList.add('Channel', 'Control')
+
+  el.appendChild(fa(faName))
+  el.appendChild(document.createTextNode(` ${name}`))
+  return el
+}
+
+class UserChannel extends Channel {
+  constructor (name, logging) {
+    super(name, logging)
+    this.controls.appendChild(createControl('chevron-down', 'Profile'))
+    this.controls.appendChild(createControl('copy', 'Logs'))
+    this.controls.appendChild(createControl('sliders-h', 'Settings'))
+    this.controls.appendChild(createControl('times', 'Close tab'))
+    this.controls.appendChild(createControl('exclamation-triangle', 'Alert Staff'))
+  }
+}
+class ChatChannel extends Channel {
+  constructor (name, logging) {
+    super(name, logging)
+    /* this.controls.appendChild(createControl('chevron-down', 'Description'))
+    this.controls.appendChild(createControl('copy', 'Logs'))
+    this.controls.appendChild(createControl('sliders-h', 'Settings'))
+    this.controls.appendChild(createControl('times', 'Close tab'))
+    this.controls.appendChild(createControl('exclamation-triangle', 'Alert Staff')) */
+    // this.controls.appendChild(createControl('ellipsis-v', ''))
+    // this.controls.appendChild(createControl('times', ''))
+
+    this.controls.appendChild(createControl('chevron-down', 'Description'))
+    this.controls.appendChild(createControl('copy', 'Logs'))
+    this.controls.appendChild(createControl('sliders-h', 'Settings'))
+    this.controls.appendChild(createControl('times', 'Close tab'))
+  }
+}
+class DefaultChannel extends Channel {
+  constructor (name, logging) {
+    super(name, logging)
+    this.controls.appendChild(createControl('copy', 'Logs'))
+    this.controls.appendChild(createControl('sliders-h', 'Settings'))
   }
 }
 
@@ -72,26 +119,25 @@ class ChatMessage extends ChannelMessage {
     this.text = text
 
     const timestampEl = document.createElement('span')
-    const textEl = document.createElement('span')
-    const userEl = document.createElement('span')
-
     timestampEl.classList.add('Message', 'Timestamp')
-    textEl.classList.add('Message', 'Body')
-    userEl.classList.add('Message', 'User')
+    timestampEl.setAttribute('title', `[${formatTimestamp(Preferences.get('timestamptemplate').full, timestamp)}]`)
+    timestampEl.appendChild(document.createTextNode(`[${formatTimestamp(Preferences.get('timestamptemplate').short, timestamp)}]`))
 
+    const userEl = document.createElement('span')
+    userEl.classList.add('Message', 'User')
     userEl.tabIndex = 0
     userEl.draggable = true
     userEl.style.color = user.getColor()
+    userEl.appendChild(document.createTextNode(user.characterName))
+
+    const textEl = document.createElement('span')
+    textEl.classList.add('Message', 'Body')
+    textEl.appendChild(userEl)
+    textEl.appendChild(document.createTextNode(`: ${text}`))
 
     this.el.appendChild(timestampEl)
     this.el.appendChild(document.createTextNode(' '))
     this.el.appendChild(textEl)
-    textEl.appendChild(userEl)
-
-    timestampEl.appendChild(document.createTextNode(`[${formatTimestamp(Preferences.get('timestamptemplate').short, timestamp)}]`))
-    timestampEl.setAttribute('title', `[${formatTimestamp(Preferences.get('timestamptemplate').full, timestamp)}]`)
-    textEl.appendChild(document.createTextNode(`: ${text}`))
-    userEl.appendChild(document.createTextNode(user.characterName))
   }
 }
 

@@ -1,3 +1,22 @@
+/*@font-face {
+  font-family: "Fermion User Theme Emoji";
+  src: url("../lib/noto/NotoColorEmoji.ttf");
+}*/
+
+/*
+
+  --fermion-fa: iconname      document.body.style.getPropertyValue('--fermion-fa') 
+      only that one gets selected.
+
+  --fermion-tabindex: 0-*     window.getComputedStyle(document.body).getPropertyValue('--fermion-scaling')
+      computed style gets selected
+
+*/
+
+.Toolbar.Button[title="Credentials"] .UnhandledIcon {
+  --fermion-icon: id-card;
+}
+
 :root {
   --default-grid-left: 1fr;
   --default-grid-right: 0fr;
@@ -11,6 +30,10 @@
 
 :root, button {
   font-size: calc(16pt * var(--fermion-scaling));
+}
+
+button {
+  cursor: pointer;
 }
 
 html {
@@ -64,21 +87,6 @@ html {
   grid-column-end: right;
   grid-row-start: top;
   grid-row-end: toolchat;
-}
-
-#channels {
-  min-width: calc(300px * var(--fermion-scaling));
-  grid-column-start: left;
-  grid-column-end: chanchat;
-  grid-row-start: toolchat;
-  grid-row-end: chatstat;
-}
-
-.Channel.Main {
-  grid-column-start: chanchat;
-  grid-column-end: chatuser;
-  grid-row-start: toolchat;
-  grid-row-end: chattext;
 }
 
 #users {
@@ -187,14 +195,58 @@ html {
   background: darkgray;
 }
 
-#top-content > li ul {
-  list-style: none;
-  position: relative;
-  margin: 0;
-  padding-left: calc(30pt * var(--fermion-scaling));
+/** CHANNELLIST AREA **/
+
+.Channellist.Main {
+  min-width: calc(300px * var(--fermion-scaling));
+  grid-column-start: left;
+  grid-column-end: chanchat;
+  grid-row-start: toolchat;
+  grid-row-end: chatstat;
 }
 
-#channels li > button:first-child {
+.Channellist.Main button.close {
+  background: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 0;
+  width: calc(32pt * var(--fermion-scaling));
+  padding: 0;
+  height: calc(32pt * var(--fermion-scaling));
+}
+
+.Channellist.Main button.close span {
+  line-height: calc(32pt * var(--fermion-scaling));
+  text-align: center;
+  width: 100%;
+  display: block;
+  padding: 1px 0 0 1px;
+}
+
+.Channellist.Main button.close:hover {
+  background: red;
+}
+
+.Channellist.Avatar {
+  background: gray;
+  width: calc(32pt * var(--fermion-scaling));
+  height: calc(32pt * var(--fermion-scaling));
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.Channellist.User.Entry {
+  padding-left: calc(32pt * var(--fermion-scaling));
+}
+
+.Channellist.Main li {
+  position: relative;
+}
+
+.Channellist.Main li > .Channellist.Button {
   text-align: left;
   display: block;
   width: 100%;
@@ -207,11 +259,18 @@ html {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-#channels li > button:first-child:hover {
+.Channellist.Main li > .Channellist.Button:hover {
   background: darkgray;
 }
 
-#top-content > li li::before {
+.Channellist.Main > ul > li ul {
+  list-style: none;
+  position: relative;
+  margin: 0;
+  padding-left: calc(30pt * var(--fermion-scaling));
+}
+
+.Channellist.Main > ul > li li::before {
   content: " ";
   position: absolute;
   width: 1px;
@@ -221,7 +280,7 @@ html {
   left: calc(-16pt * var(--fermion-scaling));
 }
 
-#top-content > li li::after {
+.Channellist.Main > ul > li li::after {
   content: " ";
   position: absolute;
   left: -10px;
@@ -232,65 +291,31 @@ html {
   left: calc(-16pt * var(--fermion-scaling));
 }
 
-#top-content > li li:not(:first-child):last-child::before {display: none;}
-#top-content > li li:only-child::before {
+.Channellist.Main > ul > li li:not(:first-child):last-child::before {display: none;}
+.Channellist.Main > ul > li li:only-child::before {
   height: calc(16pt * var(--fermion-scaling));
 }
 
-#top-content > li li {
+.Channellist.Main > ul > li li {
   width:100%;
   display: block;
   position: relative;
 }
 
-#top-content {
+.Channellist.Main > ul {
   list-style: none;
   margin: calc(4px * var(--fermion-scaling));
   padding-left: 0;
 }
 
-#channels button.close {
-  background: 0;
-  position: absolute;
-  top: 0;
-  right: 0;
-  border: 0;
-  width: calc(32pt * var(--fermion-scaling));
-  padding: 0;
-  height: calc(32pt * var(--fermion-scaling));
-}
-
-#channels button.close span {
-  line-height: calc(32pt * var(--fermion-scaling));
-  text-align: center;
-  width: 100%;
-  display: block;
-  padding: 1px 0 0 1px;
-}
-
-#channels button.close:hover {
-  background: red;
-}
-
-#channels .channeluserav {
-  background: gray;
-  width: calc(32pt * var(--fermion-scaling));
-  height: calc(32pt * var(--fermion-scaling));
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-#channels .user {
-  padding-left: calc(32pt * var(--fermion-scaling));
-}
-
-#channels li {
-  position: relative;
-}
-
 /** CHANNEL AREA **/
+
+.Channel.Main {
+  grid-column-start: chanchat;
+  grid-column-end: chatuser;
+  grid-row-start: toolchat;
+  grid-row-end: chattext;
+}
 
 .Channel.Title {
   font-size: 120%;

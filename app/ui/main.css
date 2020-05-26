@@ -1,14 +1,39 @@
+/** Specify fallback emoji font **/
+
 @font-face {
-  font-family: "EmojiFont";
+  font-family: "Noto Color Emoji";
   src: url("../lib/noto/NotoColorEmoji.ttf");
 }
 
-button {
-  font-family: Helvetica, Arial, 'EmojiFont', sans-serif;
+button, body {
+  font-family: Helvetica, Arial, 'Fermion User Theme Emoji', 'Noto Color Emoji', sans-serif;
 }
 
+/** Always hide hidden elements and unhandled icons **/
+
+*[hidden] {
+  display: none !important;
+}
+
+.UnhandledIcon {
+  visibility: hidden;
+}
+
+/** Give unhandled icons a default appearance **/
+
+.UnhandledIcon::after {
+  content: '\fffd';
+  visibility: visible;
+  display: inline-block;
+  width: 1em;
+  overflow: hidden;
+  line-height: 100%;
+}
+}
+
+/** Default styles **/
+
 body {
-  font-family: Helvetica, Arial, 'EmojiFont', sans-serif;
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -50,4 +75,26 @@ body {
 .Layout.Main {
   flex-grow:1;
   display: grid;
+}
+
+/** Ensure that minimize and maximize and close have a default style so that they'll always get handled. **/
+
+.Titlebar.Button.Minimize .UnhandledIcon {
+  --fermion-icon-style: far;
+  --fermion-icon: window-minimize;
+}
+
+.Titlebar.Button.Maximize .UnhandledIcon {
+  --fermion-icon-style: far;
+  --fermion-icon: window-maximize;
+}
+
+.Titlebar.Button.Restore .UnhandledIcon {
+  --fermion-icon-style: far;
+  --fermion-icon: window-restore;
+}
+
+.Titlebar.Button.Close .UnhandledIcon {
+  --fermion-icon-style: far;
+  --fermion-icon: window-close;
 }

@@ -1,6 +1,6 @@
 # Fermion
 
-Fermion is a third-party F-Chat client written in Electron. It's cross-platform and requires minimal effort to install and get running.
+Fermion is a third-party F-Chat client written in Electron. It's cross-platform and requires minimal effort to install and use.
 
 ## Features 
 (Yet to be implemented; this is still a non-functional version at this stage)
@@ -19,3 +19,4 @@ Fermion is a third-party F-Chat client written in Electron. It's cross-platform 
   * Save statuses and ads for easy use later
   * Optionally hide your typing status from other users
   * A library of eicons you've used before for ease of use
+  * Autocomple and syntax hints for commands

@@ -20,7 +20,7 @@
   <div class='Titlebar Main'>
     <div class='Titlebar Handle'><span>F</span><span>ermion</span></div>
     <div class='Titlebar Controls'>
-      <button class='Titlebar Button Minimize' title='Minimize'><span class='far fa-window-minimize'></span></button><button class='Titlebar Button Maximize' title='Maximize'><span class='far fa-window-maximize'></span></button><button class='Titlebar Button Close' title='Close'><span class='far fa-window-close'></span></button>
+      <button class='Titlebar Button Minimize' title='Minimize'><span class='UnhandledIcon'></span></button><button class='Titlebar Button Maximize' title='Maximize'><span class='UnhandledIcon'></span></button><button class='Titlebar Button Close' title='Close'><span class='UnhandledIcon'></span></button>
     </div>
   </div>
   <!--<div id='tool-bar' style='font-size:24pt;padding-left:32px;'>
@@ -113,52 +113,52 @@
   <div class='Layout Main'>
     <div class='Toolbar Main'>
       <ul class='Toolbar Groups'>
-        <li class='Toolbar Section'><button class='Toolbar Button' title='Credentials'><span class='fas fa-id-card'></span></button><button class='Toolbar Button' title='Connect'><span class='fas fa-sign-in-alt'></span></button><button class='Toolbar Button' title='Disonnect'><span class='fas fa-sign-out-alt'></span></button></li>
+        <li class='Toolbar Section'><button class='Toolbar Button' title='Credentials'><span class='UnhandledIcon '></span> Account</button><button class='Toolbar Button' title='Connect'><span class='fas fa-sign-in-alt'></span> Connect</button><button class='Toolbar Button' title='Disonnect'><span class='fas fa-sign-out-alt'></span> Disconnect</button></li>
       </ul>
     </div>
-    <div id='channels'>
-      <ul id='top-content'>
+    <div class='Channellist Main'>
+      <ul id='top-content' class='Channellist List'>
         <li><hr/></li>
         <li>
-          <button class='default-channel'><span class='fas fa-home'></span> Home</button>
+          <button class='Channellist Default Entry Button'><span class='fas fa-home'></span> Home</button>
         </li>
         <li>
-          <button class='default-channel'><span class='fas fa-history'></span> Conversation History</button>
+          <button class='Channellist Default Entry Button'><span class='fas fa-history'></span> Conversation History</button>
         </li>
         <li>
-          <button class='default-channel'><span class='fas fa-sliders-h'></span> Settings</button>
+          <button class='Channellist Default Entry Button'><span class='fas fa-sliders-h'></span> Settings</button>
         </li>
         <li><hr/></li>
         <li>
-          <button class='folder'><span class='fas fa-folder-open'></span> Messages</button>
-          <ul class='folder-contents'>
+          <button class='Channellist Directory Button'><span class='fas fa-folder-open'></span> Messages</button>
+          <ul class='Channellist List'>
             <li>
-              <button class='folder'><span class='fas fa-folder-open'></span> Friends</button>
-              <ul class='folder-contents'>
+              <button class='Channellist Directory Button'><span class='fas fa-folder-open'></span> Friends</button>
+              <ul class='Channellist List'>
                 <li>
-                  <button class='user'><div class='channeluserav'></div>&nbsp;McTestFace😀😀</button>
+                  <button class='Channellist User Entry Button'><div class='Channellist Avatar'></div>&nbsp;McTestFace😀😀</button>
                 </li>
               </ul>
             </li>
           </ul>
         </li>
         <li>
-          <button class='folder' title='Channels (45)'><span class='fas fa-folder-open'></span> Channels</button>
+          <button class='Channellist Directory Button' title='Channels (45)'><span class='fas fa-folder-open'></span> Channels</button>
           <button class='close'><span class='fas fa-ellipsis-v'></span></button>
-          <ul class='folder-contents'>
+          <ul class='Channellist List'>
             <li>
-              <button class='channel' title='Frontpage (15)'><span class='fas fa-align-left'></span> Frontpage</button>
+              <button class='Channellist Entry Button' title='Frontpage (15)'><span class='fas fa-align-left'></span> Frontpage</button>
               <button class='close'><span class='fas fa-times'></span></button>
             </li>
             <li>
-              <button class='channel' title='Fermion Support (30)'><span class='fas fa-align-left'></span> Fermion Support</button>
+              <button class='Channellist Entry Button' title='Fermion Support (30)'><span class='fas fa-align-left'></span> Fermion Support</button>
               <button class='close'><span class='fas fa-sliders-h'></span></button>
             </li>
           </ul>
         </li>
         <li><hr/></li>
         <li>
-          <button class='default-channel'><span class='fas fa-trash'></span> <em>Drag here to delete</em></button>
+          <button class='Channellist Default Entry Button'><span class='fas fa-trash'></span> <em>Drag here to delete</em></button>
         </li>
       </ul>
     </div>

@@ -13,9 +13,9 @@
 
 */
 
-.Toolbar.Button[title="Credentials"] .UnhandledIcon {
+/*.Toolbar.Button[title="Credentials"] .Icon {
   --fermion-icon: id-card;
-}
+}*/
 
 :root {
   --default-grid-left: 1fr;
@@ -89,7 +89,7 @@ html {
   grid-row-end: toolchat;
 }
 
-#users {
+.Userlist.Main {
   min-width: calc(300px * var(--fermion-scaling));
   grid-column-start: chatuser;
   grid-column-end: right;
@@ -97,20 +97,19 @@ html {
   grid-row-end: chattext;
 }
 
-#status {
+.Selfsummary.Main {
   grid-column-start: left;
   grid-column-end: stattext;
   grid-row-start: chatstat;
   grid-row-end: bottom;
 }
 
-#text {
+.Textentry.Main {
   grid-column-start: stattext;
   grid-column-end: right;
   grid-row-start: chattext;
   grid-row-end: bottom;
 }
-
 
 .Toolbar.Groups {
   margin: 0;
@@ -138,14 +137,14 @@ html {
   background: darkgray
 }
 
-#status {
+.Selfsummary.Main {
   display: flex;
   background: lightgray;
   border-radius: 120px;
   overflow: hidden;
 }
 
-#userav {
+.Selfsummary.Avatarwrapper {
   width: calc(100px * var(--fermion-scaling));
   height: calc(100px * var(--fermion-scaling));
   border-radius: calc(100px * var(--fermion-scaling));
@@ -155,7 +154,7 @@ html {
   margin-right: calc(8px * var(--fermion-scaling));
 }
 
-#userstatusicon {
+.Selfsummary.Statusicon {
   bottom: calc(-2px * var(--fermion-scaling));
   right: calc(-2px * var( --fermion-scaling));
   position: absolute;
@@ -167,7 +166,7 @@ html {
   padding: 1px;
 }
 
-#userinfo {
+.Selfsummary.Info {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -176,22 +175,22 @@ html {
   margin-left: 15px;
 }
 
-#username {
+.Selfsummary.User {
   font-weight: bold;
 }
 
-#usertoolbar {
+.Selfsummary.Controls {
   width: 80%;
   text-align: center;
 }
 
-#usertoolbar > button {
+.Selfsummary.Button {
   height:100%;
   background: transparent;
   border: 0;
 }
 
-#usertoolbar > button:hover {
+.Selfsummary.Button:hover {
   background: darkgray;
 }
 

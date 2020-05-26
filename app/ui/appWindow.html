@@ -20,7 +20,7 @@
   <div class='Titlebar Main'>
     <div class='Titlebar Handle'><span>F</span><span>ermion</span></div>
     <div class='Titlebar Controls'>
-      <button class='Titlebar Button Minimize' title='Minimize'><span class='UnhandledIcon'></span></button><button class='Titlebar Button Maximize' title='Maximize'><span class='UnhandledIcon'></span></button><button class='Titlebar Button Close' title='Close'><span class='UnhandledIcon'></span></button>
+      <button class='Titlebar Button Minimize' title='Minimize'><span class='Icon'></span></button><button class='Titlebar Button Maximize' title='Maximize'><span class='Icon'></span></button><button class='Titlebar Button Close' title='Close'><span class='Icon'></span></button>
     </div>
   </div>
   <!--<div id='tool-bar' style='font-size:24pt;padding-left:32px;'>
@@ -113,11 +113,11 @@
   <div class='Layout Main'>
     <div class='Toolbar Main'>
       <ul class='Toolbar Groups'>
-        <li class='Toolbar Section'><button class='Toolbar Button' title='Credentials'><span class='UnhandledIcon '></span> Account</button><button class='Toolbar Button' title='Connect'><span class='fas fa-sign-in-alt'></span> Connect</button><button class='Toolbar Button' title='Disonnect'><span class='fas fa-sign-out-alt'></span> Disconnect</button></li>
+        <li class='Toolbar Section'><button class='Toolbar Button' title='Credentials'><span class='Icon '></span> Account</button><button class='Toolbar Button' title='Connect'><span class='fas fa-sign-in-alt'></span> Connect</button><button class='Toolbar Button' title='Disonnect'><span class='fas fa-sign-out-alt'></span> Disconnect</button></li>
       </ul>
     </div>
     <div class='Channellist Main'>
-      <ul id='top-content' class='Channellist List'>
+      <ul class='Channellist List'>
         <li><hr/></li>
         <li>
           <button class='Channellist Default Entry Button'><span class='fas fa-home'></span> Home</button>
@@ -163,20 +163,21 @@
       </ul>
     </div>
     <div class='Channel Main'></div>
-    <div id='users'>users</div>
-    <div id='status'>
-      <div id='userav'>
-        <div id='userstatusicon'>
+    <div class='Userlist Main'>users</div>
+    <div class='Selfsummary Main'>
+      <div class='Selfsummary Avatarwrapper'>
+        <div class='Selfsummary Statusicon Looking'>
           <span class='fas fa-eye'></span>
         </div>
+        <img src='' title='' alt='Test User' class='Selfsummary Avatar' />
       </div>
-      <div id='userinfo'>
+      <div class='Selfsummary Info'>
         <div>test</div>
-        <div id='username'>Test User</div>
-        <div id='usertoolbar'><button title='Credentials'><span class='fas fa-id-card'></span></button ><button title='Connect'><span class='fas fa-sign-in-alt'></span></button><button title='Disonnect'><span class='fas fa-sign-out-alt'></span></button></div>
+        <div class='Selfsummary User'>Test User</div>
+        <div class='Selfsummary Controls'><button class='Selfsummary Button' title='Credentials'><span class='fas fa-id-card'></span></button ><button class='Selfsummary Button' title='Connect'><span class='fas fa-sign-in-alt'></span></button><button class='Selfsummary Button' title='Disonnect'><span class='fas fa-sign-out-alt'></span></button></div>
       </div>
     </div>
-    <div id='text'>text</div>
+    <div class='Textentry Main'>text</div>
   </div>
   <script src='../js/DateTimeFormatter.js'></script>
   <script src='../js/Channel.js'></script>

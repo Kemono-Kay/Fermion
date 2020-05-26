@@ -37,16 +37,9 @@ window.addEventListener('FermionWindowUpdated', () => {
     }
   }
   if (el) {
-    el.querySelector('.HandledIcon').classList = 'UnhandledIcon'
-    window.bridge.handleIcons()
+    // el.querySelector('.HandledIcon').classList = 'Icon'
+    window.bridge.rehandleIcons(el)
   }
-  /* if (window.bridge.windowstatus === 'full') {
-    document.querySelector('.Button.Maximize').title = 'Restore Down'
-    document.querySelector('.Button.Maximize > span').className = 'far fa-window-restore'
-  } else {
-    document.querySelector('.Button.Maximize').title = 'Maximize'
-    document.querySelector('.Button.Maximize > span').className = 'far fa-window-maximize'
-  } */
 })
 
 // Temporary, replace with proper event handler later

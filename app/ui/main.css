@@ -9,26 +9,13 @@ button, body {
   font-family: Helvetica, Arial, 'Fermion User Theme Emoji', 'Noto Color Emoji', sans-serif;
 }
 
-/** Always hide hidden elements and unhandled icons **/
+/** Always hide hidden elements and unhandled icons. **/
+/* (Using an id so it can be overridden, but it won't happen on accident.) */
 
-*[hidden] {
-  display: none !important;
-}
-
-.UnhandledIcon {
-  visibility: hidden;
-}
-
-/** Give unhandled icons a default appearance **/
-
-.UnhandledIcon::after {
-  content: '\fffd';
-  visibility: visible;
-  display: inline-block;
-  width: 1em;
-  overflow: hidden;
-  line-height: 100%;
-}
+#FermionApp [hidden],
+#FermionApp .Icon,
+#FermionApp .fa- {
+  display: none;
 }
 
 /** Default styles **/
@@ -79,22 +66,22 @@ body {
 
 /** Ensure that minimize and maximize and close have a default style so that they'll always get handled. **/
 
-.Titlebar.Button.Minimize .UnhandledIcon {
+.Titlebar.Button.Minimize > .Icon {
   --fermion-icon-style: far;
   --fermion-icon: window-minimize;
 }
 
-.Titlebar.Button.Maximize .UnhandledIcon {
+.Titlebar.Button.Maximize > .Icon {
   --fermion-icon-style: far;
   --fermion-icon: window-maximize;
 }
 
-.Titlebar.Button.Restore .UnhandledIcon {
+.Titlebar.Button.Restore > .Icon {
   --fermion-icon-style: far;
   --fermion-icon: window-restore;
 }
 
-.Titlebar.Button.Close .UnhandledIcon {
+.Titlebar.Button.Close > .Icon {
   --fermion-icon-style: far;
   --fermion-icon: window-close;
 }

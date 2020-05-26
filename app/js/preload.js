@@ -47,20 +47,21 @@ window.bridge = {
   maximize: function () {
     ipcRenderer.invoke('window', 'maximize')
   },
-  handleIcons: function () {
-    document.querySelectorAll('.UnhandledIcon').forEach(el => {
-      const style = window.getComputedStyle(el)
+  handleIcons: function (rootElement = document) {
+    rootElement.querySelectorAll('.Icon').forEach(el => {
+      const iconName = window.getComputedStyle(el).getPropertyValue('--fermion-icon').trim()
+      const iconStyle = window.getComputedStyle(el).getPropertyValue('--fermion-icon-style').trim()
       el.classList.add(
         'HandledIcon',
-        style.getPropertyValue('--fermion-icon-style').trim() || 'fas',
-        `fa-${style.getPropertyValue('--fermion-icon').trim()}`)
-      el.classList.remove('UnhandledIcon')
+        iconStyle || 'fas',
+        `fa-${iconName}`)
+      el.classList.remove('Icon')
     })
   },
-  rehandleIcons: function () {
-    document.querySelectorAll('.HandledIcon').forEach(el => {
-      el.className = 'UnhandledIcon'
+  rehandleIcons: function (rootElement = document) {
+    rootElement.querySelectorAll('.HandledIcon').forEach(el => {
+      el.className = 'Icon'
     })
-    window.bridge.handleIcons()
+    window.bridge.handleIcons(rootElement)
   }
 }

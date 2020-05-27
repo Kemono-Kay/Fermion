@@ -48,14 +48,14 @@ window.bridge = {
     ipcRenderer.invoke('window', 'maximize')
   },
   handleIcons: function (rootElement = document) {
-    rootElement.querySelectorAll('.Icon').forEach(el => {
+    rootElement.querySelectorAll('.Icon:not(.HandledIcon)').forEach(el => {
       const iconName = window.getComputedStyle(el).getPropertyValue('--fermion-icon').trim()
       const iconStyle = window.getComputedStyle(el).getPropertyValue('--fermion-icon-style').trim()
       el.classList.add(
         'HandledIcon',
         iconStyle || 'fas',
         `fa-${iconName}`)
-      el.classList.remove('Icon')
+      // el.classList.remove('Icon')
     })
   },
   rehandleIcons: function (rootElement = document) {

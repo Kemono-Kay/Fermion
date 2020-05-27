@@ -28,6 +28,32 @@ appReadyAwaiter.run().then(() => {
   app.exit(1)
 })
 
+/*
+////// Constant highlight: //////
+
+setTimeout(() => {
+  const test = new BrowserWindow({
+    frame: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'js', 'preload.js'),
+      nodeIntegration: true
+    }
+  })
+
+  setTimeout(() => {
+    const i = setInterval(() => {
+      appWindow.flashFrame(true)
+    })
+    appWindow.once('focus', () => {
+      clearInterval(i)
+      appWindow.flashFrame(false)
+    })
+  }, 3000)
+  appWindow.flashFrame(true)
+}, 5000) */
+
 app.on('ready', function () {
   appWindow = new BrowserWindow({
     show: false,

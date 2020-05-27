@@ -5,7 +5,7 @@
   src: url("../lib/noto/NotoColorEmoji.ttf");
 }
 
-button, body {
+button, body, textarea {
   font-family: Helvetica, Arial, 'Fermion User Theme Emoji', 'Noto Color Emoji', sans-serif;
 }
 
@@ -13,7 +13,7 @@ button, body {
 /* (Using an id so it can be overridden, but it won't happen on accident.) */
 
 #FermionApp [hidden],
-#FermionApp .Icon,
+#FermionApp .Icon:not(.HandledIcon),
 #FermionApp .fa- {
   display: none;
 }

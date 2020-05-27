@@ -147,7 +147,7 @@ html {
 .Selfsummary.Avatarwrapper {
   width: calc(100px * var(--fermion-scaling));
   height: calc(100px * var(--fermion-scaling));
-  border-radius: calc(100px * var(--fermion-scaling));
+  border-radius: calc(50px * var(--fermion-scaling));
   background: darkgray;
   float:left;
   position: relative;
@@ -192,6 +192,21 @@ html {
 
 .Selfsummary.Button:hover {
   background: darkgray;
+}
+
+.Selfsummary.Statusicon > span {
+  display: block;
+  width: 98%;
+  text-align: center;
+  position: relative;
+  top: 1px;
+}
+
+.Selfsummary.Avatar {
+  width: calc(100px * var(--fermion-scaling));
+  height: calc(100px * var(--fermion-scaling));
+  display: block;
+  border-radius: calc(50px * var( --fermion-scaling));
 }
 
 /** CHANNELLIST AREA **/
@@ -338,3 +353,91 @@ html {
   margin: calc(8px * var(--fermion-scaling)) 0;
 }
 
+/** Textentry **/
+
+.Textentry.Button {
+  padding: 0;
+  height: 1.5em;
+  width: 2em;
+}
+
+.Textentry.Button.Send {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: calc(100px * var(--fermion-scaling));
+  height: calc(100px * var(--fermion-scaling));
+  line-height: calc(100px * var(--fermion-scaling));
+  border: 1px solid black;
+  border-left: 0;
+  border-radius: 0 5px 5px 0;
+}
+
+.Textentry.Button.Send .Icon {
+  --fermion-icon: arrow-right;
+}
+
+.Textentry.Button.Richtext {
+  float: right;
+}
+
+.Textentry.Button.Richtext .Icon {
+  --fermion-icon: code;
+}
+
+.Textentry.Button.Bold .Icon {
+  --fermion-icon: bold;
+}
+
+.Textentry.Main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.Textentry.Editable {
+  border: 1px solid black;
+  resize: none;
+  display: block;
+  flex-grow: 1;
+  width: calc(100% - 100px * var(--fermion-scaling));
+  box-sizing: border-box;
+  border-radius: 5px 0 0 5px;
+}
+
+.Textentry.Controls {
+  width: calc(100% - 120px * var(--fermion-scaling));
+}
+
+/** Statusicons **/
+
+.Statusicon.Looking .Icon {
+  --fermion-icon: eye;
+}
+
+.Statusicon.Online .Icon {
+  --fermion-icon: user;
+}
+
+.Statusicon.Busy .Icon {
+  --fermion-icon: hourglass-half;
+}
+
+.Statusicon.Dnd .Icon {
+  --fermion-icon: minus-circle;
+}
+
+.Statusicon.Away .Icon {
+  --fermion-icon: power-off;
+}
+
+.Statusicon.Idle .Icon {
+  --fermion-icon: clock;
+}
+
+.Statusicon.Crown .Icon {
+  right: 1px;
+  font-size: 95%;
+  width: 110%;
+  --fermion-icon: crown;
+}

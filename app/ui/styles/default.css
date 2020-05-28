@@ -403,6 +403,8 @@ html {
   width: calc(100% - 100px * var(--fermion-scaling));
   box-sizing: border-box;
   border-radius: 5px 0 0 5px;
+  padding: 2px 4px;
+  line-height: 1.2;
 }
 
 .Textentry.Controls {

@@ -181,12 +181,14 @@
       <div class='Textentry Controls'>
         <button class='Textentry Button Bold' title='Bold'><span class='Icon'></span></button><button class='Textentry Button Richtext' title='Toggle Rich Text Editing'><span class='Icon'></span></button><button class='Textentry Button Send' title='Send'><span class='Icon'></span></button>
       </div>
-      <textarea class='Textentry Editable'></textarea>
+      <!--<div contenteditable='true' class='Textentry Editable Richtextmode'><div class='Markup Line'></div></div>-->
+      <div contenteditable='true' class='Textentry Editable Richtextmode'><div class='Markup Line'>Line 1</div><div class='Markup Line'><span class='Markup'>-<span class='Markup aaa'>newline</span>-</span> Line 2 <span class='Markup'>--</span></div><div class='Markup Line'>Line 3</div></div>
     </div>
   </div>
   <script src='../js/DateTimeFormatter.js'></script>
   <script src='../js/Channel.js'></script>
   <script src='../js/appWindow.js'></script>
   <script src='../js/test.js'></script>
+  <script src='../js/___.js'></script>
 </body>
 </html>

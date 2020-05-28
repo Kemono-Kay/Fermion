@@ -5,7 +5,7 @@
   src: url("../lib/noto/NotoColorEmoji.ttf");
 }
 
-button, body, textarea {
+button, body {
   font-family: Helvetica, Arial, 'Fermion User Theme Emoji', 'Noto Color Emoji', sans-serif;
 }
 
@@ -84,4 +84,47 @@ body {
 .Titlebar.Button.Close > .Icon {
   --fermion-icon-style: far;
   --fermion-icon: window-close;
+}
+
+/** Text formatting **/
+
+.Markup.Line,
+.Markup.List {
+  display: block;
+}
+
+.Markup.ListItem {
+  display: list-item;
+}
+
+.Markup:not(.Line):not(.List):not(.ListItem) {
+  display: inline;
+}
+
+.Markup.Bold {
+  font-weight: bold;
+}
+
+.Markup.Italic {
+  font-style: italic;
+}
+
+.Markup.Underline {
+  text-decoration: underline;
+}
+
+.Markup.Strikethrough {
+  text-decoration: line-through;
+}
+
+.Markup.Left {
+  text-align: left;
+}
+
+.Markup.Right {
+  text-align: right;
+}
+
+.Markup.Center {
+  text-align: center;
 }

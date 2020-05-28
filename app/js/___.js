@@ -89,6 +89,8 @@ function parseFromString (str) {
     }
 
     switch (el.tagName.toLowerCase()) {
+      case 'br':
+        break
       case 'span': {
         // el = replaceEl(el, 'span')
         const attributes = [...el.attributes]
@@ -297,6 +299,19 @@ function parseFromString (str) {
     for (const subEl of el.childNodes) {
       parseThisAndChildren(subEl)
     }
+
+    /* if (el.querySelectorAll(':root > :not(.Color)').length === 0) {
+      el.removeAttribute('Color')
+    } */
+    /* if (![...el.childNodes].some(node =>
+      (node.nodeType === Node.TEXT_NODE &&
+      node.textContent.length > 0) ||
+      (node.nodeType === Node.ELEMENT_NODE &&
+      !node.classList.contains('Color'))
+    )) {
+      el.classList.add('RemoveColor')
+      // el.classList.remove('Color')
+    } */
   }
 
   // Parse document
@@ -308,15 +323,16 @@ function parseFromString (str) {
   removeEls.forEach(el => el.remove())
   removeEls = []
 
-  // Insert line breaks instead of Line elements.
+  // Insert linebreaks instead of Line elements.
   // This allows splitting the DOM tree using another bit of code.
   newDocument.querySelectorAll('.Line').forEach(el => {
     const parentIsBlock = el.parentElement.classList.contains('Line')
     if (!parentIsBlock || el.previousSibling !== null) {
-      el.before(document.createTextNode('\n'))
+      el.before(document.createElement('br'))
     }
     if (!parentIsBlock || el.nextSibling !== null) {
-      el.after(document.createTextNode('\n'))
+      el.after(document.createElement('br'))
+      // el.after(document.createTextNode('\n'))
     }
   })
 
@@ -332,6 +348,36 @@ function parseFromString (str) {
 
   // Remove useless elements again
   removeEls.forEach(el => el.remove())
+  removeEls = []
+  unzipDOM(newDocument.body, [...newDocument.querySelectorAll('br')].map(el => ({
+    node: el,
+    offset: 0
+  })))
+  newDocument.querySelectorAll('br').forEach(el => el.remove())
+  newDocument.querySelectorAll('body > *').forEach(el => el.classList.add('Line'))
+
+  // Remove useless '.Color' nodes
+  newDocument.querySelectorAll('.Color').forEach(el => {
+    if (![...el.childNodes].some(node =>
+      (node.nodeType === Node.TEXT_NODE &&
+      node.textContent.length > 0) ||
+      (node.nodeType === Node.ELEMENT_NODE &&
+      !node.classList.contains('Color'))
+    )) {
+      el.classList.add('RemoveColor')
+    }
+  })
+  newDocument.querySelectorAll('.RemoveColor').forEach(el => {
+    el.classList.remove('Color', 'RemoveColor')
+    el.removeAttribute('data-col')
+    if (el.className === 'Markup') {
+      ;[...el.childNodes].reverse().forEach(node => el.after(node))
+      removeEls.push(el)
+    }
+  })
+
+  // Remove useless elements
+  removeEls.forEach(el => el.remove())
 
   return newDocument
 }
@@ -339,5 +385,19 @@ function parseFromString (str) {
 function setCol (root) {
   root.querySelectorAll('.Color').forEach(el => {
     el.style.color = `rgb(${el.getAttribute('data-col')})`
+  })
+}
+
+/**
+ * Unzips the DOM down to the base node, splitting it at a list of positions.
+ * @param {Node} baseNode
+ * @param {{node: Node, offset: Number}} unzipPositions
+ */
+function unzipDOM (baseNode, unzipPositions) {
+  unzipPositions.forEach(pos => {
+    const range = new Range()
+    range.setStart(baseNode, 0)
+    range.setEnd(pos.node, pos.offset)
+    range.insertNode(range.extractContents())
   })
 }

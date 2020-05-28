@@ -20,7 +20,7 @@
   <div class='Titlebar Main'>
     <div class='Titlebar Handle'><span>F</span><span>ermion</span></div>
     <div class='Titlebar Controls'>
-      <button class='Titlebar Button Minimize' title='Minimize'><span class='Icon'></span></button><button class='Titlebar Button Maximize' title='Maximize'><span class='Icon'></span></button><button class='Titlebar Button Close' title='Close'><span class='Icon'></span></button>
+      <button class='Titlebar Button Minimize' title='Minimize'><span class='Icon'></span><span class='Label'>Minimize</span></button><button class='Titlebar Button Maximize' title='Maximize'><span class='Icon'></span><span class='Label'>Maximize</span></button><button class='Titlebar Button Close' title='Close'><span class='Icon'></span><span class='Label'>Close</span></button>
     </div>
   </div>
   <!--<div id='tool-bar' style='font-size:24pt;padding-left:32px;'>
@@ -182,13 +182,14 @@
         <button class='Textentry Button Bold' title='Bold'><span class='Icon'></span></button><button class='Textentry Button Richtext' title='Toggle Rich Text Editing'><span class='Icon'></span></button><button class='Textentry Button Send' title='Send'><span class='Icon'></span></button>
       </div>
       <!--<div contenteditable='true' class='Textentry Editable Richtextmode'><div class='Markup Line'></div></div>-->
-      <div contenteditable='true' class='Textentry Editable Richtextmode'><div class='Markup Line'>Line 1</div><div class='Markup Line'><span class='Markup'>-<span class='Markup aaa'>newline</span>-</span> Line 2 <span class='Markup'>--</span></div><div class='Markup Line'>Line 3</div></div>
+      <div contenteditable='true' class='Textentry Editable Richtextmode'><span class='Markup Line'>Line 1</span><span class='Markup Line'><span class='Markup Bold'>-<span class='Markup Italic'>new&#x0a;line</span>-</span> Line 2 <span class='Markup Bold'>--</span></span><span class='Markup Line'>Line 3</span></div>
     </div>
   </div>
   <script src='../js/DateTimeFormatter.js'></script>
   <script src='../js/Channel.js'></script>
   <script src='../js/appWindow.js'></script>
   <script src='../js/test.js'></script>
+  <script src='../js/richTextEditor.js'></script>
   <script src='../js/___.js'></script>
 </body>
 </html>

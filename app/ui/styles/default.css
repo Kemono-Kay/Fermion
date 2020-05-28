@@ -40,6 +40,10 @@ html {
   --fermion-scaling: 1;
 }
 
+.Titlebar .Label {
+  display: none;
+}
+
 .Titlebar.Button {
   border: 0;
   background: transparent;

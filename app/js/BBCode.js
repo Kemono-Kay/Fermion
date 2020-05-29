@@ -28,18 +28,27 @@ class Tag {
   }
 }
 
+/*
+
+MD:
+
+-- en dash
+--- em dash
+
+*/
+
 const validBBCodeTags = [
   new Tag('b', { disallowedChildren: ['b'] }), // **x**
   new Tag('i', { disallowedChildren: ['i'] }), // _x_, *x*
   new Tag('u', { disallowedChildren: ['u'] }), // __x__
   new Tag('s', { disallowedChildren: ['s'] }), // ~~x~~
   new Tag('url', { takesArgument: true, disallowedChildren: 'all' }), // [x](y)
-  new Tag('sup', { disallowedChildren: ['sup', 'sub', 'url'] }),
-  new Tag('sub', { disallowedChildren: ['sup', 'sub', 'url'] }),
+  new Tag('sup', { disallowedChildren: ['sup', 'sub', 'url'] }), // ^^x^^
+  new Tag('sub', { disallowedChildren: ['sup', 'sub', 'url'] }), // ~x~
   new Tag('color', { takesArgument: true }),
 
   // Fermion-specific
-  new Tag('_42'),
+  // new Tag('_42'),
   new Tag('li'),
   new Tag('ol', { takesArgument: true }), // Sequence of element numbers or keyword
   new Tag('ul'),
@@ -111,6 +120,29 @@ class BBCodeParser {
           el.remove()
         }
       })
+
+    // Turn unknown tags without a matching closing or opening tag into text
+    this.dom.querySelectorAll('*[unknown-unhandled]').forEach(el => {
+      if (!el.getAttribute('unknown-unhandled')) return
+      const matchingTagType = !el.getAttribute('tag-close')
+      var sibling = el
+      while (true) {
+        sibling = sibling.nextElementSibling
+        if (sibling === null) break
+        if (!sibling.getAttribute('unknown-unhandled')) continue
+        if (
+          Boolean(sibling.getAttribute('tag-close')) === matchingTagType &&
+          el.getAttribute('tag-name') === sibling.getAttribute('tag-name')
+        ) {
+          el.removeAttribute('unknown-unhandled')
+          sibling.removeAttribute('unknown-unhandled')
+        }
+      }
+    })
+    this.dom.querySelectorAll('*[unknown-unhandled]').forEach(el => {
+      el.before(this.dom.createTextNode(el.getAttribute('original-text')))
+      el.remove()
+    })
   }
 
   setBBCode (str, settings = {}) {
@@ -128,8 +160,11 @@ class BBCodeParser {
       if (!tag) {
         this.errors.push([`Unknown tag [${match[MATCH.NAME]}]`, currentNode])
         currentNode.lastChild.textContent = str.slice(0, match.index)
-        const el = this.dom.createElement('unknown')
+        const el = this.dom.createElement(match[MATCH.NAME])
+        el.setAttribute('unknown-unhandled', true)
+        el.setAttribute('unknown', true)
         el.setAttribute('tag-name', match[MATCH.NAME])
+        el.setAttribute('original-text', match[0])
         if (match[MATCH.ARG]) el.setAttribute('tag-arg', match[MATCH.ARG])
         if (match[MATCH.CLOSE]) el.setAttribute('tag-close', true)
         currentNode.appendChild(el)

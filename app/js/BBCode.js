@@ -92,41 +92,33 @@ class BBCodeParser {
       const tag = validBBCodeTags.find(tag => tag.name === match[MATCH.NAME])
       if (!tag) continue
 
-      // Ignore hacked close tag
+      // Close current node
       if (
-        this.settings.parseHackTags &&
-        match[MATCH.CLOSE] &&
-        currentNode.getAttribute('hack-tag') === match[MATCH.NAME] &&
-        !currentNode.getAttribute('hack-set')
-      ) {
-        currentNode.setAttribute('hack-set', true)
-        currentNode.lastChild.textContent = str.slice(0, match.index) + str.slice(match.index + match[MATCH.ALL].length)
-
-      // Ignore hacked close tag after element
-      } else if (
-        this.settings.parseHackTags &&
-        match[MATCH.CLOSE] &&
-        currentNode.lastElementChild.getAttribute('hack-tag') === match[MATCH.NAME]
-      ) {
-        /// TODO
-
-      // Close old node
-      } else if ((
         match[MATCH.CLOSE] &&
         currentNode.tagName.toLowerCase() === match[MATCH.NAME]
-      ) || (
-        this.settings.parseHackTags &&
-        !tag.takesArgument &&
-        `/${currentNode.tagName.toLowerCase()}` === match[MATCH.ARG]
-      )) {
+      ) {
         currentNode.lastChild.textContent = str.slice(0, match.index)
         currentNode = currentNode.parentElement
         currentNode.appendChild(this.dom.createTextNode(str.slice(match.index + match[MATCH.ALL].length)))
+
+      // Close hacked current node
+      } else if (
+        this.settings.parseHackTags &&
+        !tag.takesArgument &&
+        `/${currentNode.tagName.toLowerCase()}` === match[MATCH.ARG]
+      ) {
+        currentNode.lastChild.textContent = str.slice(0, match.index)
+        currentNode = currentNode.parentElement
+        currentNode.appendChild(
+          this.dom.createTextNode(
+            `[${match[MATCH.NAME]}]` + str.slice(match.index + match[MATCH.ALL].length)))
 
       // Create new node
       } else {
         currentNode.lastChild.textContent = str.slice(0, match.index)
         var el
+
+        // Create hack node
         if (
           this.settings.parseHackTags &&
           !tag.takesArgument &&
@@ -137,18 +129,21 @@ class BBCodeParser {
           el = this.dom.createElement(match[MATCH.ARG])
           const arg = match[MATCH.ARG].split('=')[1]
           if (arg && hackTag.takesArgument) el.setAttribute('arg', arg)
-          el.setAttribute('hack-tag', tag.name)
+          currentNode.appendChild(el)
+          if (tag.requiresClosing) currentNode = el
+          currentNode.appendChild(
+            this.dom.createTextNode(
+              `[${match[MATCH.NAME]}]` + str.slice(match.index + match[MATCH.ALL].length)))
+
+        // Create normal node
         } else {
           el = this.dom.createElement(tag.name)
           if (match[MATCH.ARG] && tag.takesArgument) el.setAttribute('arg', match[MATCH.ARG])
+          currentNode.appendChild(el)
+          if (tag.requiresClosing) currentNode = el
+          currentNode.appendChild(this.dom.createTextNode(str.slice(match.index + match[MATCH.ALL].length)))
         }
 
-        // el.setAttribute('takes-argument', tag.takesArgument)
-        // el.setAttribute('requires-closing', tag.requiresClosing)
-
-        currentNode.appendChild(el)
-        if (tag.requiresClosing) currentNode = el
-        currentNode.appendChild(this.dom.createTextNode(str.slice(match.index + match[MATCH.ALL].length)))
         regex.lastIndex = 0
       }
     }

@@ -89,6 +89,9 @@ function parseFromString (str) {
     }
 
     switch (el.tagName.toLowerCase()) {
+      case 'script':
+        removeEls.push(el)
+        return
       case 'br':
         break
       case 'span': {

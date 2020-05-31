@@ -1,0 +1,275 @@
+.b .effect {
+  font-weight: bold;
+}
+
+.i .effect {
+  font-style: italic;
+}
+
+.u .effect {
+  text-decoration: underline;
+}
+
+.s .effect {
+  text-decoration: line-through;
+}
+
+.left .effect {
+  text-align: left;
+}
+
+.right .effect {
+  text-align: right;
+}
+
+.center .effect {
+  text-align: center;
+}
+
+.justify .effect .t0 {
+  display: block;
+  text-align: justify;
+  text-align-last: justify;
+}
+
+.justify .effect .t1 {
+  display: block;
+  text-align: justify;
+}
+
+.sup .effect .t0 {
+  font-size: x-small;
+  vertical-align: super;
+}
+
+.sub .effect .t0 {
+  font-size: x-small;
+  vertical-align: sub;
+}
+
+.color .effect {
+  color:red;
+  text-shadow: black 0px 1px 2px;
+}
+
+.user .effect .t0 {
+  color:rgb(92, 92, 92);
+  font-weight: bold;
+  cursor: pointer;
+}
+.user .effect .t0:hover {
+  color:gray;
+  text-decoration: underline;
+}
+
+.session .effect .t0 {
+  font-weight: bold;
+  cursor: pointer;
+}
+.session .effect .t0:hover {
+  color:gray;
+  text-decoration: underline;
+}
+.session .effect .t0::before {
+  content: '#'
+}
+
+.li .effect,
+.ol .effect,
+.ul .effect {
+  position: relative;
+  margin-left: calc(-100% + 40px);
+  width: calc(100% - 40px);
+}
+.li .effect > *,
+.ol .effect > *,
+.ul .effect > * {
+  display: list-item;
+  
+}
+.li .effect .t0::before {
+  content: '5.';
+}
+.li .effect .t1::before {
+  content: '10.';
+}
+.ol .effect .t0::before {
+  content: 'VII.';
+}
+.ol .effect .t1::before {
+  content: 'VIII.';
+}
+.ul .effect .t0,
+.ul .effect .t1 {
+  list-style: square;
+}
+.li .effect .t0::before,
+.li .effect .t1::before,
+.ol .effect .t0::before,
+.ol .effect .t1::before,
+.ul .effect .t0::before,
+.ul .effect .t1::before {
+  position: absolute;
+  left: -40px;
+  right: calc(100%);
+  text-align:right;
+}
+
+.big .effect {
+  font-size: larger;
+}
+
+.small .effect {
+  font-size: smaller;
+}
+
+.code .effect {
+  font-family: monospace;
+}
+
+.heading .effect {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.quote .effect .qh {
+  padding-left: 0.5em;
+  margin-left: 5px;
+  font-style: italic;
+}
+.quote .effect .qb {
+  border-left: 5px solid darkgray;
+  padding-left: 0.5em;
+}
+
+.indent .effect .t0 {
+  display: block;
+  text-indent: 40px;
+}
+.indent .effect .t1 {
+  display: block;
+  padding-left: 40px;
+  text-indent: -40px;
+}
+
+.hr0 {
+  border: none;
+  border-top: 3px double black;
+  overflow: visible;
+  text-align: center;
+  position: relative;
+  bottom: 2px;
+}
+.hr2 {
+  border-style: dashed;
+}
+
+/** Page Layout **/
+
+div + div h2 {
+  margin-top: 4em;
+}
+
+body > div {
+  padding-left: 2em;
+}
+
+.bbcode-list {
+  padding-left: 2em;
+  list-style: none;
+}
+
+.bbcode-list h3 {
+  font-family: monospace;
+  font-size: 150%;
+}
+
+.bbcode-list li + li h3 {
+  margin-top: 2em;
+}
+
+.bbcode > div.code {
+  font-family: monospace;
+  background: #e0e0e0;
+  padding: 0 2pt;
+  margin: 0 2pt;
+  display: inline-block;
+  border-radius: 3pt;
+  border: 1px solid darkgray;
+}
+
+.bbcode > div, .effect > div {
+  display: inline;
+  line-height: 1.5;
+}
+
+.example {
+  margin: 8pt;
+}
+
+.example > div {
+  display: flex;
+  flex-flow: row nowrap;
+  padding: 12pt;
+  border: 1px solid darkgray;
+  background: whitesmoke;
+  border-radius: 4pt;
+  box-shadow: 8px 8px 10px -3px black;
+  max-width: 600px;
+}
+
+.effect {
+  margin-left: -100%;
+}
+
+.bbcode, .effect {
+  box-sizing: border-box;
+  width: 100%;
+  flex: none;
+  display: block;
+}
+
+.bbcode[hidden], .effect[hidden] {
+  visibility: hidden;
+}
+
+/** Button styling **/
+
+.btn-bbcode, .btn-effect {
+  cursor: pointer;
+  border-top: 1px solid darkgray;
+  border-bottom: 1px solid darkgray;
+  background: whitesmoke;
+  position: relative;
+  top: 1px;
+  width: 75pt;
+  height: 25pt;
+}
+
+:root .btn-bbcode:hover, :root .btn-effect:hover, 
+:root .btn-bbcode:focus, :root .btn-effect:focus {
+  background: lightgray;
+  border-bottom: 1px solid darkgray;
+}
+
+.btn-bbcode[data-active=true], .btn-effect[data-active=true] {
+  border-bottom: 1px solid whitesmoke;
+  font-weight: bold;
+}
+
+.btn-bbcode[data-active=false], .btn-effect[data-active=false] {
+  background: #e0e0e0;
+}
+
+.btn-bbcode {
+  margin-left: 12pt;
+  border-top-left-radius: 4pt;
+  border-left: 1px solid darkgray;
+  border-right: 1px solid darkgray;
+}
+
+.btn-effect {
+  border-top-right-radius: 4pt;
+  border-right: 1px solid darkgray;
+  border-left: 0;
+}

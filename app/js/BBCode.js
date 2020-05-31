@@ -76,9 +76,9 @@ const { BBCodeParser } = (function () {
 
     // Fermion-specific
     // new Tag('_42'),
-    new Tag('li'),
+    new Tag('li', { takesArgument: true }), // Number/character
     new Tag('ol', { takesArgument: true }), // Sequence of element numbers or keyword
-    new Tag('ul'),
+    new Tag('ul', { takesArgument: true }), // List style
     new Tag('img', { disallowedChildren: 'all', takesArgument: true, requiresContent: false }), // ![x](y)
     new Tag('big'),
     new Tag('small'),
@@ -95,7 +95,7 @@ const { BBCodeParser } = (function () {
     new Tag('heading'), // Shorthand for bold & big? Not implemented
     new Tag('collapse', { takesArgument: true, requiresContent: false }),
     new Tag('quote'), // > x
-    new Tag('indent'), // TODO: if alignment switches to right, indent on the right side. Justify will match the parent.
+    new Tag('indent'), // TODO: if alignment switches to right, indent on the right side. Justify/center goes both ways.
     new Tag('hr', { requiresClosing: false }) // ---, ***, - - -, * * *, etc.
 
   ]

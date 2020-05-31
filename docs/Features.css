@@ -1,0 +1,14 @@
+body {
+  margin: 1em 3em;
+}
+
+body > ul {
+  list-style: none;
+}
+
+a.ref {
+  display: block;
+  font-style: italic;
+  font-size: smaller;
+  margin: 0.5em 1em;
+}

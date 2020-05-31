@@ -22,7 +22,7 @@ document.querySelectorAll('.styleExample').forEach(el => el.appendChild(document
       el.querySelectorAll('.code.open')[1].remove()
       el.querySelectorAll('.code.close')[1].remove()
     }),
-    Tag('color', text.join(''), `gives it the color <code>${argName}</code>.<br><a href='colors.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, 'red'),
+    Tag('color', text.join(''), `gives it the color <code>${argName}</code>.<br><a class='ref' href='colors.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, 'red'),
     Tag('url', shortText, `links to the webpage at <code>${argName}</code>.`, linkExample, true, el => {
       const mEl = el.querySelector('.effect')
       const a = document.createElement('a')
@@ -49,13 +49,13 @@ document.querySelectorAll('.styleExample').forEach(el => el.appendChild(document
       bEl.firstElementChild.textContent = `[ol]${bEl.firstElementChild.textContent}`
       bEl.lastElementChild.textContent += '[/ol]'
     }),
-    Tag('ol', text, `(short for Ordered List) creates a numbered list.<br>Individual entries should be wrapped with <code>li</code> tags.<br><code>${argName}</code> allows customisation of the numbering format.<br><a href='ol.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, false, true, el => {
+    Tag('ol', text, `(short for Ordered List) creates a numbered list.<br>Individual entries should be wrapped with <code>li</code> tags.<br><code>${argName}</code> allows customisation of the numbering format.<br><a class='ref' href='ol.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, false, true, el => {
       const bEl = el.querySelector('.bbcode')
       bEl.querySelectorAll('.code').forEach(el => (el.textContent = el.textContent.replace('ol', 'li')))
       bEl.firstElementChild.textContent = `[ol=VII]${bEl.firstElementChild.textContent}`
       bEl.lastElementChild.textContent += '[/ol]'
     }),
-    Tag('ul', text, `(short for Unordered List) creates a bulleted list.<br>Individual entries should be wrapped with <code>li</code> tags.<br><code>${argName}</code> allows customisation of the bulleting format.<br><a href='ul.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, false, true, el => {
+    Tag('ul', text, `(short for Unordered List) creates a bulleted list.<br>Individual entries should be wrapped with <code>li</code> tags.<br><code>${argName}</code> allows customisation of the bulleting format.<br><a class='ref' href='ul.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, false, true, el => {
       const bEl = el.querySelector('.bbcode')
       bEl.querySelectorAll('.code').forEach(el => (el.textContent = el.textContent.replace('ul', 'li')))
       bEl.firstElementChild.textContent = `[ul=square]${bEl.firstElementChild.textContent}`
@@ -92,8 +92,8 @@ document.querySelectorAll('.styleExample').forEach(el => el.appendChild(document
       t0.appendChild(q)
       t0.appendChild(text)
     }),
-    Tag('indent', text, `indents the text.<br>Different kinds of indents are specified using <code>${argName}</code>.<br><a href='indent.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, ['first', 'hanging']),
-    Tag('hr', text, `inserts a horizontal line, styled according to <code>${argName}</code><br><a href='colors.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, ['double', 'inset', 'dashed'], false, el => {
+    Tag('indent', text, `indents the text.<br>Different kinds of indents are specified using <code>${argName}</code>.<br><a class='ref' href='indent.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, ['first', 'hanging']),
+    Tag('hr', text, `inserts a horizontal line, styled according to <code>${argName}</code><br><a class='ref' href='colors.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, ['double', 'inset', 'dashed'], false, el => {
       const els = Array(3).fill(() => document.createElement('hr')).map((fn, i) => {
         const el = fn()
         el.classList.add(`hr${i}`)

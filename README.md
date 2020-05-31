@@ -5,13 +5,13 @@ Fermion is a third-party F-Chat client written in Electron. It's cross-platform 
 ## Features 
 (Yet to be implemented; this is still a non-functional version at this stage)
 
-  *[Full Feature List](#)*
+  *[Full Feature List](https://kemono-kay.github.io/Fermion/Features.html)*
 
   * Automated chat logs
   * Automatic update detection
   * Easily customisable theming
   * A more consistent user experience
-  * Switch between BBCode and Rich Text editing
+  * Switch between [BBCode](https://kemono-kay.github.io/Fermion/BBCode.html) and Rich Text editing
   * Folder structure for ordering channels and PMs arbitrarily
   * Customisable groups for easy ordering and highlighting of other users
   * Blacklist certain key words

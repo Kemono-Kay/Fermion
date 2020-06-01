@@ -49,13 +49,13 @@ document.querySelectorAll('.styleExample').forEach(el => el.appendChild(document
       bEl.firstElementChild.textContent = `[ol]${bEl.firstElementChild.textContent}`
       bEl.lastElementChild.textContent += '[/ol]'
     }),
-    Tag('ol', text, `(short for Ordered List) creates a numbered list.<br>Individual entries should be wrapped with <code>li</code> tags.<br><code>${argName}</code> allows customisation of the numbering format.<br><a class='ref' href='ol.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, false, true, el => {
+    Tag('ol', text, `(short for Ordered List) creates a numbered list.<br>Individual entries should be wrapped with <code>li</code> tags.<br><code>${argName}</code> allows customisation of the numbering format.<br><a class='ref' href='ol.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, [false, false], true, el => {
       const bEl = el.querySelector('.bbcode')
       bEl.querySelectorAll('.code').forEach(el => (el.textContent = el.textContent.replace('ol', 'li')))
       bEl.firstElementChild.textContent = `[ol=VII]${bEl.firstElementChild.textContent}`
       bEl.lastElementChild.textContent += '[/ol]'
     }),
-    Tag('ul', text, `(short for Unordered List) creates a bulleted list.<br>Individual entries should be wrapped with <code>li</code> tags.<br><code>${argName}</code> allows customisation of the bulleting format.<br><a class='ref' href='ul.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, false, true, el => {
+    Tag('ul', text, `(short for Unordered List) creates a bulleted list.<br>Individual entries should be wrapped with <code>li</code> tags.<br><code>${argName}</code> allows customisation of the bulleting format.<br><a class='ref' href='ul.html'>Click here for a list of accepted values for <code>${argName}</code></a>`, [false, false], true, el => {
       const bEl = el.querySelector('.bbcode')
       bEl.querySelectorAll('.code').forEach(el => (el.textContent = el.textContent.replace('ul', 'li')))
       bEl.firstElementChild.textContent = `[ul=square]${bEl.firstElementChild.textContent}`

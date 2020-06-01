@@ -1,9 +1,9 @@
 /* eslint-env browser */
+/* eslint-disable no-control-regex */
 
 const { BBCodeParser } = (function () {
-  function createDocument () {
-    return document.implementation.createDocument(null, 'root')
-  }
+  const urlValidationRegex = /^(?:[a-z0-9.+-]+):(?:\/\/)?(?:[^;,/?:@&=+$\s]+(?::[^;,/?:@&=+$\s]+)?@)?(?:(?:[^;,/?:@&=+$\s]+\.)+[^;,/?:@&=+$\s0-9]+|(?:[0-9]{1,3}\.){3}[0-9]{1,3}|\[((?=.*::)(?!.*::.+::)(::)?([\dA-F]{1,4}:(:|\b)|){5}|([\dA-F]{1,4}:){6})((([\dA-F]{1,4}((?!\3)::|:\b|))|(?!\2\3)){2}|(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4})\])(?:\/[^;,/?:@&=+$\s]*)*(?:;(?:(?:[^;,/?:@&=+$\s#]*=[^;/?:@&=+$\s#]*&)*[^;,/?:@&=+$\s#]*=[^;/?:@&=+$\s#]*)?)?(?:\?(?:(?:[^;,/?:@&=+$\s#]*=[^;/?:@&=+$\s#]*&)*[^;,/?:@&=+$\s#]*=[^;/?:@&=+$\s#]*)?)?(?:#[^\s]*)?$/ui
+  const urlDomainRegex = /(https?|ftps?|irc):\/\/(?:www.)?([^\/]+)/
 
   const MATCH = {
     ALL: 0,
@@ -12,311 +12,435 @@ const { BBCodeParser } = (function () {
     ARG: 3
   }
 
-  class Tag {
-    constructor (name, settings = {}) {
-    // BBCode settings
-      this.tagSafeName = name
-      this.takesArgument = settings.takesArgument !== undefined ? settings.takesArgument : false
-      this.requiresClosing = settings.requiresClosing !== undefined ? settings.requiresClosing : true
-      this.disallowedChildren = settings.disallowedChildren !== undefined ? settings.disallowedChildren : []
-      this.uselessChildren = settings.uselessChildren !== undefined ? settings.uselessChildren : []
-      this.requiresContent = settings.requiresContent !== undefined ? settings.requiresContent : true
-      this.requiresArgument = settings.requiresArgument !== undefined ? settings.requiresArgument : false
-      if (!this.requiresClosing) this.requiresContent = false
+  const createDocument = function () {
+    return document.implementation.createDocument(null, 'root')
+  }
+
+  const standardizeColor = function (str) {
+    var ctx = document.createElement('canvas').getContext('2d')
+    ctx.fillStyle = str
+    return ctx.fillStyle
+  }
+
+  const RGBToHSL = function (r, g, b) {
+    r /= 255
+    g /= 255
+    b /= 255
+    const cmin = Math.min(r, g, b)
+    const cmax = Math.max(r, g, b)
+    const delta = cmax - cmin
+    let h = 0
+    let s = 0
+    let l = 0
+    if (delta === 0) {
+      h = 0
+    } else if (cmax === r) {
+      h = ((g - b) / delta) % 6
+    } else if (cmax === g) {
+      h = (b - r) / delta + 2
+    } else {
+      h = (r - g) / delta + 4
+    }
+    h = Math.round(h * 60)
+    if (h < 0) h += 360
+    l = (cmax + cmin) / 2
+    s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1))
+    s = +(s * 100).toFixed(1)
+    l = +(l * 100).toFixed(1)
+    return [h, s, l]
+  }
+
+  const validVanillaColors = ['red', 'blue', 'white', 'yellow', 'pink', 'gray', 'green', 'orange', 'purple', 'black', 'brown', 'cyan']
+  const validVanillaColorValues = validVanillaColors
+    .map(c => standardizeColor(c))
+    .map(c => [c.slice(1, 3), c.slice(3, 5), c.slice(5, 7)]
+      .map(str => Number(`0x${str}`)))
+    .map(arr => RGBToHSL(arr[0], arr[1], arr[2]))
+
+  /**
+   * Default settings for parsing tags.
+   */
+  const defaultSettings = {
+    allowImages: true,
+    parseHackTags: true,
+    swallowUnknownTags: true
+  }
+
+  /**
+   * Default settings for a new tag type.
+   */
+  const defaultTagSettings = {
+    takesArgument: false,
+    requiresClosing: true,
+    disallowedChildren: [],
+    uselessChildren: [],
+    requiresContent: true,
+
+    vanillaTag: true,
+    validateArgAsVanilla: () => true,
+    vanillizeTag: () => '[][/]',
+    handleClosingArg: () => {}
+  }
+
+  /**
+   * List of valid tags.
+   */
+  const tags = {}
+  const vanillaTags = {}
+
+  /**
+   * Add a valid tag to the list of valid tags.
+   * @param {...Tag} args
+   */
+  const addTag = function (...args) {
+    args.forEach(tag => {
+      tags[tag.name] = tag
+      if (tag.properties.vanillaTag) vanillaTags[tag.name] = tag
+    })
+  }
+
+  const Tag = class {
+    /**
+     * Creates a tag with the provided settings to help parse between different forms.
+     * @param {String} name - Internal and BBCode tag name.
+     * @param {String} mdPattern - Pattern for Fermion 'markdown' syntax.
+     * @param {Object} settings
+     * @param {?Boolean} settings.takesArgument
+     * @param {?Boolean} settings.requiresClosing
+     * @param {?String[]} settings.disallowedChildren
+     * @param {?String[]} settings.uselessChildren
+     * @param {?Boolean} settings.requiresContent
+     * @param {?Boolean} settings.vanillaTag
+     * @param {?Function} settings.validateArgAsVanilla
+     * @param {?Function} settings.vanillizeTag
+     * @param {?Function} settings.handleClosingArg
+     */
+    constructor (name, mdPattern, settings = {}) {
+      this.name = name
+      this.mdPattern = mdPattern instanceof Array ? mdPattern : [mdPattern]
+      this.properties = { ...defaultTagSettings, ...settings }
     }
 
-    get name () {
-      return this.tagSafeName[0] === '_' ? String.fromCharCode(this.tagSafeName.slice(1)) : this.tagSafeName
+    /**
+     * returns the BBCode for the tag
+     */
+    toBBCode (arg, content, settings) {
+      settings = { ...defaultSettings, ...settings }
+      if (settings.parseHackTags && (!this.properties.vanillaTag || (arg && !this.properties.validateArgAsVanilla(arg)))) {
+        return this.properties.vanillizeTag(content, arg)
+      } else {
+        return `[${this.name + (this.properties.takesArgument && arg ? `=${arg}` : '')}]${this.properties.requiresClosing ? content + `[/${this.name}]` : ''}`
+      }
+    }
+
+    /**
+     * Returns the Fermion-flavoured markdown for the tag
+     * @param {*} arg
+     * @param {*} content
+     * @param {*} settings
+     */
+    toMD (arg, content, settings) {
+      settings = { ...defaultSettings, ...settings }
+      const pattern = arg ? this.mdPattern.find(str => str.includes('a')) : this.mdPattern.find(str => !str.includes('a'))
+      if (!pattern) return content
+      const multiline = pattern.includes('  ')
+      const splitContent = multiline ? [content] : content.split('\n')
+      return splitContent.map(str =>
+        pattern.split('c').map(str =>
+          !arg || str.split('a').length === 1 ? str : str.split('a').join(arg)).join(content))
+    }
+
+    /**
+     *
+     * @param {*} match
+     * @param {*} node
+     * @param {*} settings
+     */
+    fromBBCode (match, node, settings) {
+      /*
+      settings = { ...defaultSettings, ...settings }
+      const doc = node.ownerDocument
+      if (match[MATCH.CLOSE] && node.tagName.toLowerCase() !== this.name) return node
+      if (settings.parseHackTags && match[MATCH.CLOSE] && match[MATCH.ARG]) {
+        node = this.properties.handleClosingArg(match[MATCH.ARG], node)
+      }
+
+      const begin = node.lastChild.textContent.slice(0, match.index)
+      const end = node.lastChild.textContent.slice(match.index + match[0].length)
+
+      // Close vanilla/custom tags (not hack tags)
+      if (match[MATCH.CLOSE]) {
+        node.lastChild.textContent = begin
+        node.parentNode.appendChild(doc.createTextNode(end))
+        return node.parentNode
+      }
+
+      // Find hack tag
+      if (settings.parseHackTags && !this.properties.takesArgument && match[MATCH.ARG]) {
+        try {
+          const hackEl = doc.createElement(match[MATCH.ARG].split('=')[0])
+          hackEl.setAttribute('arg')
+          node.lastChild.textContent = begin
+          node.appendChild(hackEl)
+          hackEl.appendChild(doc.createTextNode(end))
+        } catch (err) {
+          console.error(new Error('Invalid tag'))
+        }
+      }
+
+      const normalEl = doc.createElement(this.name)
+      */
     }
   }
 
-  /*
+  addTag(
+    new Tag('b', '**c**', { uselessChildren: ['b'] }),
+    new Tag('i', ['*c*', '_c_'], { uselessChildren: ['i'] }),
+    new Tag('u', '__c__', { uselessChildren: ['u'] }),
+    new Tag('s', '~~c~~', { uselessChildren: ['s'] }),
+    new Tag('url', ['[c](a)', '[](c)'], {
+      disallowedChildren: 'all',
+      takesArgument: true,
+      validateArgAsVanilla: arg => urlValidationRegex.test(arg),
+      vanillizeTag: (content, arg) => {
+        const nArg = arg || content
+        var resultArg
+        try {
+          const fLoc = nArg.indexOf('#')
+          const url = encodeURI(fLoc !== -1 ? nArg.slice(0, fLoc) : nArg).replace(/%5B/g, '[').replace(/%5D/g, ']')
+          const frag = fLoc !== -1 ? encodeURIComponent(nArg.slice(fLoc + 1)) : undefined
+          resultArg = url
+          if (frag !== undefined) resultArg += frag
+        } catch (err) {
+          console.error(err)
+          resultArg = nArg
+        }
+        return `[url${arg ? `=${resultArg}` : ''}]${arg ? content : resultArg}[/url]`
+      },
+      handleClosingArg (arg, node) {
+        if (arg === 'img') {
+          const el = node.ownerDocument.createElement('img')
+          el.setAttribute('arg', node.getAttribute('arg'))
+          node.childNodes.forEach(node => el.appendChild(node))
+          node.after(el)
+          node.remove()
+          return el
+        }
+        return node
+      }
+    }),
+    new Tag('sup', '^^c^^', { disallowedChildren: ['sup', 'sub', 'url'] }),
+    new Tag('sub', '~c~', { disallowedChildren: ['sup', 'sub', 'url'] }),
 
-  MD:
+    new Tag('color', '||a:c||', {
+      takesArgument: true,
+      validateArgAsVanilla: arg => validVanillaColors.includes(arg),
+      vanillizeTag: (content, arg) => {
+        if (arg) {
+          const col = [standardizeColor(arg)]
+            .map(c => [c.slice(1, 3), c.slice(3, 5), c.slice(5, 7)]
+              .map(str => Number(`0x${str}`)))[0]
+          const hsl = RGBToHSL(...col)
+          const closestColor = validVanillaColors[validVanillaColorValues
+            .map(arr => [Math.abs(arr[0] - hsl[0]) * 0.9, Math.abs(arr[1] - hsl[1]) * 2.56, Math.abs(arr[2] - hsl[2]) * 2.56]
+              .reduce((acc, cur) => acc + cur))
+            .reduce((acc, cur, i, a) => cur < a[acc] ? i : acc, 0)]
+          return `[color=${closestColor}]${content}[/color=${arg}]`
+        } else {
+          return content
+        }
+      },
+      handleClosingArg (arg, node) {
+        node.setAttribute('arg', arg)
+        return node
+      }
+    }),
 
-  -- en dash
-  --- em dash
+    new Tag('user', ['<@c>', '[a](@c)', '[](@c)'], { disallowedChildren: 'all' }),
+    new Tag('icon', [':@c:', '![a](@c)', '![](@c)'], { disallowedChildren: 'all' }),
+    new Tag('eicon', [':!c:'], { disallowedChildren: 'all' }),
+    new Tag('noparse', [], { disallowedChildren: 'all' }), // Done with escape sequences in MD
+    new Tag('session', ['[a](#c)', '[](#c)'], { takesArgument: true, disallowedChildren: 'all', requiresContent: false }),
 
-  */
+    new Tag('li', ['\n+ c\n', '\n* c\n', '\n+[a] c\n', '\n*[a] c\n'], {
+      takesArgument: true, // Number/character
+      vanillaTag: false,
+      vanillizeTag: (content, arg) => `[i=li${arg ? `=${arg}` : ''}][/i]${content}[i=/li][/i]`
+    }),
+    new Tag('ol', '<[a]#  c  #>', {
+      takesArgument: true, // Sequence of element numbers or keyword
+      vanillaTag: false,
+      vanillizeTag: (content, arg) => `[i=ol${arg ? `=${arg}` : ''}][/i]${content}[i=/ol][/i]`
+    }),
+    new Tag('ul', '<[a]+  c  +>', {
+      takesArgument: true, // List style
+      vanillaTag: false,
+      vanillizeTag: (content, arg) => `[i=ul${arg ? `=${arg}` : ''}][/i]${content}[i=/ul][/i]`
+    }),
+    new Tag('img', '![c](a)', {
+      disallowedChildren: 'all',
+      takesArgument: true,
+      requiresContent: false,
+      vanillaTag: false,
+      vanillizeTag: (content, arg) => `[url=${arg}]${content | 'Untitled Link'}[/url=img]`
+    }),
+    new Tag('big', '<<c>>', { vanillaTag: false, vanillizeTag: (content) => `[i=big][/i]${content}[i=/big][/i]` }),
+    new Tag('small', '>>c<<', { vanillaTag: false, vanillizeTag: (content) => `[i=small][/i]${content}[i=/small][/i]` }),
+    new Tag('left', '|<<|  c  |<<|', { vanillaTag: false, vanillizeTag: (content) => `[i=left][/i]${content}[i=/left][/i]` }),
+    new Tag('right', '|>>|  c  |>>|', { vanillaTag: false, vanillizeTag: (content) => `[i=right][/i]${content}[i=/right][/i]` }),
+    new Tag('center', '|><|  c  |><|', { vanillaTag: false, vanillizeTag: (content) => `[i=center][/i]${content}[i=/center][/i]` }),
+    new Tag('justify', '|<a>|  c  |<>|', {
+      vanillaTag: false,
+      takesArgument: true,
+      vanillizeTag: (content, arg) => `[i=justify${arg ? `=${arg}` : ''}][/i]${content}[i=/justify][/i]`
+    }),
 
-  // Profile tags:
-  /*
-
-  Apparently no further subtags are allowed.
-
-  big allows: ['url','i','u','b','color','s']
-  small allows: ['url','i','u','b','color','s']
-
-  sup allows: ["b", "i", "u"]
-  sub allows: ["b", "i", "u"]
-
-  */
-
-  const webclientBBCodeTags = [
-    new Tag('b', { uselessChildren: ['b'] }), // **x**
-    new Tag('i', { uselessChildren: ['i'] }), // _x_, *x*
-    new Tag('u', { uselessChildren: ['u'] }), // __x__
-    new Tag('s', { uselessChildren: ['s'] }), // ~~x~~
-    new Tag('url', { takesArgument: true, disallowedChildren: 'all' }), // [x](y)
-    new Tag('sup', { disallowedChildren: ['sup', 'sub', 'url'] }), // ^^x^^
-    new Tag('sub', { disallowedChildren: ['sup', 'sub', 'url'] }), // ~x~
-    new Tag('color', { takesArgument: true }),
-
-    // F-Chat-only context
-    new Tag('user', { disallowedChildren: 'all' }), // <@x>, [](@x)
-    new Tag('icon', { disallowedChildren: 'all' }), // :@x:, ![](@x)
-    new Tag('eicon', { disallowedChildren: 'all' }), // :x:
-    new Tag('noparse', { disallowedChildren: 'all' }), // Done with escape sequences in MD
-    new Tag('session', { takesArgument: true, disallowedChildren: 'all', requiresContent: false }) // [x](#y)
-  ]
-
-  const validBBCodeTags = [
-
-    ...webclientBBCodeTags,
-
-    // Fermion-specific
-    // new Tag('_42'),
-    new Tag('li', { takesArgument: true }), // Number/character
-    new Tag('ol', { takesArgument: true }), // Sequence of element numbers or keyword
-    new Tag('ul', { takesArgument: true }), // List style
-    new Tag('img', { disallowedChildren: 'all', takesArgument: true, requiresContent: false }), // ![x](y)
-    new Tag('big'),
-    new Tag('small'),
-    new Tag('left'),
-    new Tag('right'),
-    new Tag('center'),
-    new Tag('justify'), // Not implemented
-    new Tag('code', { disallowedChildren: 'all' }), // Not implemented ```x```, `x`
+    new Tag('code', ['`c`', '```a\nc```'], { vanillaTag: false, disallowedChildren: 'all', takesArgument: true, vanillizeTag: (content, arg) => `[i=code${arg ? `=${arg}` : ''}][/i]${content}[i=/code][/i]` }),
     /*
     possibly table, too
     */
 
     // Profile parsing, not implemented
-    new Tag('heading'), // Shorthand for bold & big? Not implemented
-    new Tag('collapse', { takesArgument: true, requiresContent: false }),
-    new Tag('quote'), // > x
-    new Tag('indent'), // TODO: if alignment switches to right, indent on the right side. Justify/center goes both ways.
-    new Tag('hr', { requiresClosing: false }) // ---, ***, - - -, * * *, etc.
+    new Tag('heading', '\n#c', { vanillaTag: false, vanillizeTag: (content) => `[i=heading][/i]${content}[i=/heading][/i]` }),
+    new Tag('collapse', ['[a]{c}', '[]{c}'], {
+      vanillaTag: false,
+      requiresContent: false,
+      takesArgument: true,
+      vanillizeTag: (content, arg) => `[i=collapse${arg ? `=${arg}` : ''}][/i]${content}[i=/collapse][/i]`
+    }),
+    new Tag('quote', [' > c', '\n> c', ' >[a] c', '\n>[a] c'], {
+      vanillaTag: false,
+      takesArgument: true,
+      vanillizeTag: (content, arg) => `[i=quote${arg ? `=${arg}` : ''}][/i]${content}[i=/quote][/i]`
+    }), // > x
+    new Tag('indent', [], {
+      vanillaTag: false,
+      takesArgument: true,
+      vanillizeTag: (content, arg) => `[i=indent${arg ? `=${arg}` : ''}][/i]${content}[i=/indent][/i]`
+    }), // TODO: if alignment switches to right, indent on the right side. Justify/center goes both ways.
+    new Tag('hr', [], {
+      vanillaTag: false,
+      takesArgument: true,
+      requiresClosing: false,
+      vanillizeTag: (arg) => `[i=hr${arg ? `=${arg}` : ''}][/i]`
+    }) // ---, ***, - - -, * * *, etc.
 
-  ]
+  )
 
-  const contentTags = validBBCodeTags
-    .filter(tag => tag.requiresContent)
-    .map(tag => tag.name)
-
-  const uselessChildren = validBBCodeTags
-    .filter(tag => tag.uselessChildren)
-    .reduce((acc, cur) => [...acc, ...cur.uselessChildren], [])
-    .filter((v, i, a) => a.indexOf(v) === i)
-
-  /**
-   * Parser class
-   */
-  class BBCodeParser {
+  const BBCodeParser = class {
     constructor () {
+      this.dom = createDocument()
       this.errors = []
-      this.dom = createDocument()
-      this.settings = {
-        allowImages: true,
-        parseHackTags: true,
-        swallowUnknownTags: true
-      } // For disallowing images, producing BBCode for F-Chat vs. internal etc.
     }
 
-    getErrors () {
-      return this.errors.map(err => {
-        var str = `Error: ${err[0]}`
-        var el = err[1]
-        while (el.parentElement) {
-          str += `\n\tin [${el.tagName.toLowerCase()}] tag`
-          el = el.parentElement
-        }
-        return str
-      })
-    }
-
-    correctDOM (settings = {}) {
-      settings = { ...this.settings, ...settings }
-      // Filtering out empty tags that are useless when empty
-      ;[...this.dom
-        .querySelectorAll(contentTags)]
-        .filter(el => el.textContent.length === 0)
-        .reverse()
-        .forEach(el => {
-          if ([...el.children].every(el => contentTags.includes(el.tagName.toLowerCase()))) {
-            ;[...el.childNodes].forEach(node => el.before(node))
-            el.remove()
-          }
-        })
-
-      // Turn unknown tags without a matching closing or opening tag into text
-      this.dom.querySelectorAll('*[unknown-unhandled]').forEach(el => {
-        if (!el.getAttribute('unknown-unhandled')) return
-        const matchingTagType = !el.getAttribute('tag-close')
-        var sibling = el
-        while (true) {
-          sibling = sibling.nextElementSibling
-          if (sibling === null) break
-          if (!sibling.getAttribute('unknown-unhandled')) continue
-          if (
-            Boolean(sibling.getAttribute('tag-close')) === matchingTagType &&
-          el.getAttribute('tag-name') === sibling.getAttribute('tag-name')
-          ) {
-            el.removeAttribute('unknown-unhandled')
-            sibling.removeAttribute('unknown-unhandled')
-          }
-        }
-      })
-      this.dom.querySelectorAll('*[unknown-unhandled]').forEach(el => {
-        el.before(this.dom.createTextNode(el.getAttribute('original-text')))
-        el.remove()
-      })
-
-      // Remove useless tags
-      this.dom
-        .querySelectorAll(uselessChildren)
-        .forEach(el => {
-          var currentNode = el
-          while (currentNode.parentElement) {
-            currentNode = currentNode.parentElement
-            if (validBBCodeTags.find(tag => tag.uselessChildren.includes(currentNode.tagName.toLowerCase()))) {
-              ;[...el.childNodes].forEach(node => el.before(node))
-              el.remove()
-              break
-            }
-          }
-        })
-    }
-
+    /**
+     * Sets the DOM using a given BBCode string
+     * @param {*} str
+     * @param {*} settings
+     */
     setBBCode (str, settings = {}) {
-      settings = { ...this.settings, ...settings }
+      settings = { ...defaultSettings, ...settings }
       this.dom = createDocument()
+      this.errors = []
       var currentNode = this.dom.firstElementChild
       currentNode.appendChild(this.dom.createTextNode(str))
-      const regex = /\[(\/?)([\w-]*?)(?:(?:=(.*?))?)\]/g
+      const regex = /\[ *?(\/?) *?([a-zA-Z_-]*?) *?(?:(?:=(.*?))?) *?\]/g
 
       while (true) {
         const str = currentNode.lastChild.textContent
         const match = regex.exec(str)
         if (match === null) break
-        const tag = validBBCodeTags.find(tag => tag.name === match[MATCH.NAME])
+        const tag = tags[match[MATCH.NAME]]
+        const begin = str.slice(0, match.index)
+        const end = str.slice(match.index + match[MATCH.ALL].length)
+
+        // Unknown tag
         if (!tag) {
           this.errors.push([`Unknown tag [${match[MATCH.NAME]}]`, currentNode])
-          currentNode.lastChild.textContent = str.slice(0, match.index)
-          const el = this.dom.createElement(match[MATCH.NAME])
-          el.setAttribute('unknown-unhandled', true)
-          el.setAttribute('unknown', true)
-          el.setAttribute('tag-name', match[MATCH.NAME])
-          el.setAttribute('original-text', match[0])
-          if (match[MATCH.ARG]) el.setAttribute('tag-arg', match[MATCH.ARG])
-          if (match[MATCH.CLOSE]) el.setAttribute('tag-close', true)
-          currentNode.appendChild(el)
-          currentNode.appendChild(
-            this.dom.createTextNode(
-              str.slice(match.index + match[MATCH.ALL].length)))
+          currentNode.lastChild.textContent = begin
+          try {
+            const el = this.dom.createElement(match[MATCH.NAME])
+            el.setAttribute('unknown-unhandled', true)
+            el.setAttribute('unknown', true)
+            el.setAttribute('tag-name', match[MATCH.NAME])
+            el.setAttribute('original-text', match[0])
+            if (match[MATCH.ARG]) el.setAttribute('tag-arg', match[MATCH.ARG])
+            el.setAttribute('tag-close', Boolean(match[MATCH.CLOSE]))
+            currentNode.appendChild(el)
+          } catch (err) {
+            this.errors.push([`Invalid tag tag [${match[MATCH.NAME]}]`, currentNode])
+            currentNode.appendChild(this.dom.createTextNode(match[MATCH.NAME]))
+          }
+          currentNode.appendChild(this.dom.createTextNode(str.slice(end)))
           regex.lastIndex = 0
           continue
         }
-        const currentTag =
-        validBBCodeTags.find(tag => tag.name === currentNode.tagName.toLowerCase()) ||
-        { disallowedChildren: [] }
 
-        // Close current node
-        if (
-          match[MATCH.CLOSE] &&
-        currentNode.tagName.toLowerCase() === match[MATCH.NAME]
-        ) {
-          currentNode.lastChild.textContent = str.slice(0, match.index)
-          currentNode = currentNode.parentElement
-          currentNode.appendChild(this.dom.createTextNode(str.slice(match.index + match[MATCH.ALL].length)))
-          regex.lastIndex = 0
-
-        // Close hacked current node
-        } else if (
-          settings.parseHackTags &&
-        !tag.takesArgument &&
-        `/${currentNode.tagName.toLowerCase()}` === match[MATCH.ARG]
-        ) {
-          currentNode.lastChild.textContent = str.slice(0, match.index)
-          currentNode = currentNode.parentElement
-          currentNode.appendChild(
-            this.dom.createTextNode(
-            `[${match[MATCH.NAME]}]` + str.slice(match.index + match[MATCH.ALL].length)))
-          regex.lastIndex = 0
-
-        // Create new node
-        } else if (
-          !match[MATCH.CLOSE] &&
-        !(currentTag.disallowedChildren === 'all' ||
-        currentTag.disallowedChildren.includes(match[MATCH.NAME]))
-        ) {
-          currentNode.lastChild.textContent = str.slice(0, match.index)
-
-          // Create hack node
-          if (
-            settings.parseHackTags &&
-          !tag.takesArgument &&
-          match[MATCH.ARG] &&
-          validBBCodeTags.find(tag => tag.name === match[MATCH.ARG].split('=')[0])
-          ) {
-            const hackTag = validBBCodeTags.find(tag => tag.name === match[MATCH.ARG].split('=')[0])
-            const el = this.dom.createElement(match[MATCH.ARG])
-            const arg = match[MATCH.ARG].split('=')[1]
-            if (arg && hackTag.takesArgument) el.setAttribute('arg', arg)
-            currentNode.appendChild(el)
-            if (tag.requiresClosing) currentNode = el
-            currentNode.appendChild(
-              this.dom.createTextNode(
-              `[${match[MATCH.NAME]}]` + str.slice(match.index + match[MATCH.ALL].length)))
-
-          // Create normal node
-          } else {
-            const el = this.dom.createElement(tag.name)
-            if (match[MATCH.ARG] && tag.takesArgument) el.setAttribute('arg', match[MATCH.ARG])
-            currentNode.appendChild(el)
-            if (tag.requiresClosing) currentNode = el
-            currentNode.appendChild(this.dom.createTextNode(str.slice(match.index + match[MATCH.ALL].length)))
-          }
-
-          regex.lastIndex = 0
-
-        // Closing unopened node
-        } else if (
-          match[MATCH.CLOSE] &&
-        !(currentTag.disallowedChildren === 'all' ||
-        currentTag.disallowedChildren.includes(match[MATCH.NAME]))
-        ) {
-          this.errors.push([`Couldn't find matching opening tag for [/${match[MATCH.NAME]}]`, currentNode])
+        if (match[MATCH.CLOSE] && currentNode.tagName.toLowerCase() !== tag.name) continue
+        if (settings.parseHackTags && match[MATCH.CLOSE] && match[MATCH.ARG]) {
+          currentNode = tag.properties.handleClosingArg(match[MATCH.ARG], currentNode)
         }
+
+        // Close vanilla/custom tags (not hack tags)
+        if (match[MATCH.CLOSE]) {
+          currentNode.lastChild.textContent = begin
+          currentNode.parentNode.appendChild(this.dom.createTextNode(end))
+          regex.lastIndex = 0
+          continue
+        }
+
+        // Cut off text to insert new elements
+        currentNode.lastChild.textContent = begin
+
+        // Find hack tag
+        if (settings.parseHackTags && !tag.properties.takesArgument && match[MATCH.ARG]) {
+          const hackElTag = tags[match[MATCH.ARG].split('=')[0].replace('/', '').trim()]
+          if (hackElTag) {
+            const hackEl = this.dom.createElement(hackElTag.name)
+            if (hackElTag.properties.takesArgument) hackEl.setAttribute('arg', match[MATCH.ARG].split('=')[1].trim())
+            if (hackElTag.properties.requiresClosing) {
+              hackEl.setAttribute('hacktag-unhandled', true)
+              hackEl.setAttribute('tag-close', match[MATCH.ARG].split('=')[0].trim()[0] === '/')
+            }
+            currentNode.appendChild(hackEl)
+          }
+        }
+
+        // Add normal tag
+        const normalEl = this.dom.createElement(tag.name)
+        if (match[MATCH.ARG]) normalEl.setAttribute('arg', match[MATCH.ARG])
+        currentNode.appendChild(normalEl)
+        currentNode = normalEl
+        currentNode.appendChild(this.dom.createTextNode(end))
+        regex.lastIndex = 0
       }
-      var unclosedEl = currentNode
-      while (unclosedEl.parentElement) {
-        this.errors.push([`Couldn't find matching closing tag for [${unclosedEl.tagName.toLowerCase()}]`, unclosedEl.parentNode])
-        unclosedEl = unclosedEl.parentElement
+
+      // Fix pairs
+      const pairSoloEls = (name) => {
+        this.dom.querySelectorAll(`[${name}-unhandled][tag-close=true]`).forEach(el => {
+          var sibling = el
+          while (sibling) {
+            sibling = sibling.nextElementSibling
+            if (sibling.getAttribute('tag-close') && sibling.tagName === el.tagName) {
+              while (el.nextSibling !== sibling) {
+                el.appendChild(el.nextSibling)
+              }
+              sibling.remove()
+              el.removeAttribute(`${name}-unhandled`)
+              el.removeAttribute('tag-close')
+              break
+            }
+          }
+        })
       }
-      this.correctDOM(settings)
-    }
-
-    setHTML (str) {
-
-    }
-
-    setMD (str) {
-
-    }
-
-    getBBCode () {
-
-    }
-
-    getHTML () {
-
-    }
-
-    getMD () {
-
+      pairSoloEls('unknown')
+      pairSoloEls('hacktag')
+      this.dom.querySelectorAll('[hacktag-unhandled]').forEach(el => el.remove())
+      this.dom.querySelectorAll('[unknown-unhandled]').forEach(el => {
+        el.after(this.dom.createTextNode(el.getAttribute('original-text')))
+        el.remove()
+      })
     }
   }
-
   return { BBCodeParser }
 })()

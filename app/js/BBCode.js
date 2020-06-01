@@ -2,8 +2,8 @@
 /* eslint-disable no-control-regex */
 
 const { BBCodeParser } = (function () {
-  const urlValidationRegex = /^(?:[a-z0-9.+-]+):(?:\/\/)?(?:[^;,/?:@&=+$\s]+(?::[^;,/?:@&=+$\s]+)?@)?(?:(?:[^;,/?:@&=+$\s]+\.)+[^;,/?:@&=+$\s0-9]+|(?:[0-9]{1,3}\.){3}[0-9]{1,3}|\[((?=.*::)(?!.*::.+::)(::)?([\dA-F]{1,4}:(:|\b)|){5}|([\dA-F]{1,4}:){6})((([\dA-F]{1,4}((?!\3)::|:\b|))|(?!\2\3)){2}|(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4})\])(?:\/[^;,/?:@&=+$\s]*)*(?:;(?:(?:[^;,/?:@&=+$\s#]*=[^;/?:@&=+$\s#]*&)*[^;,/?:@&=+$\s#]*=[^;/?:@&=+$\s#]*)?)?(?:\?(?:(?:[^;,/?:@&=+$\s#]*=[^;/?:@&=+$\s#]*&)*[^;,/?:@&=+$\s#]*=[^;/?:@&=+$\s#]*)?)?(?:#[^\s]*)?$/ui
-  const urlDomainRegex = /(https?|ftps?|irc):\/\/(?:www.)?([^\/]+)/
+  const urlValidationRegex = /^(?:[a-z0-9.+-]+):(?:\/\/)?(?:[^:]+(?::.*)?@)?(?:(?:[^;,/?.:@&=+$\s]+\.)+[^;,/?.:@&=+$\s0-9]+|(?:[0-9]{1,3}\.){3}[0-9]{1,3}|\[((?=.*::)(?!.*::.+::)(::)?([\dA-F]{1,4}:(:|\b)|){5}|([\dA-F]{1,4}:){6})((([\dA-F]{1,4}((?!\3)::|:\b|))|(?!\2\3)){2}|(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4})\])(?::[0-9]{1,5})?(?:\/[^;,/?:@&=+$\s]*)*(?:;(?:(?:[^;,/?:@&=+$\s#]*(?:=[^;/?:@&=+$\s#]*)?&)*[^;,/?:@&=+$\s#]*(?:=[^;/?:@&=+$\s#]*)?)?)?(?:\?(?:(?:[^;,/?:@&=+$\s#]*(?:=[^;/?:@&=+$\s#]*)?&)*[^;,/?:@&=+$\s#]*(?:=[^;/?:@&=+$\s#]*)?)?)?(?:#[^\s]*)?$/ui
+  const urlDomainRegex = /^(?:[a-z0-9.+-]+):(?:\/\/)?(?:[^:]+(?::.*)?@)?(?:www\.)?(.*?)(?::[0-9]{1,5})?(?:\/[^;,/?:@&=+$\s]*)*(?:;(?:(?:[^;,/?:@&=+$\s#]*(?:=[^;/?:@&=+$\s#]*)?&)*[^;,/?:@&=+$\s#]*(?:=[^;/?:@&=+$\s#]*)?)?)?(?:\?(?:(?:[^;,/?:@&=+$\s#]*(?:=[^;/?:@&=+$\s#]*)?&)*[^;,/?:@&=+$\s#]*(?:=[^;/?:@&=+$\s#]*)?)?)?(?:#[^\s]*)?$/ui
 
   const MATCH = {
     ALL: 0,
@@ -149,48 +149,6 @@ const { BBCodeParser } = (function () {
         pattern.split('c').map(str =>
           !arg || str.split('a').length === 1 ? str : str.split('a').join(arg)).join(content))
     }
-
-    /**
-     *
-     * @param {*} match
-     * @param {*} node
-     * @param {*} settings
-     */
-    fromBBCode (match, node, settings) {
-      /*
-      settings = { ...defaultSettings, ...settings }
-      const doc = node.ownerDocument
-      if (match[MATCH.CLOSE] && node.tagName.toLowerCase() !== this.name) return node
-      if (settings.parseHackTags && match[MATCH.CLOSE] && match[MATCH.ARG]) {
-        node = this.properties.handleClosingArg(match[MATCH.ARG], node)
-      }
-
-      const begin = node.lastChild.textContent.slice(0, match.index)
-      const end = node.lastChild.textContent.slice(match.index + match[0].length)
-
-      // Close vanilla/custom tags (not hack tags)
-      if (match[MATCH.CLOSE]) {
-        node.lastChild.textContent = begin
-        node.parentNode.appendChild(doc.createTextNode(end))
-        return node.parentNode
-      }
-
-      // Find hack tag
-      if (settings.parseHackTags && !this.properties.takesArgument && match[MATCH.ARG]) {
-        try {
-          const hackEl = doc.createElement(match[MATCH.ARG].split('=')[0])
-          hackEl.setAttribute('arg')
-          node.lastChild.textContent = begin
-          node.appendChild(hackEl)
-          hackEl.appendChild(doc.createTextNode(end))
-        } catch (err) {
-          console.error(new Error('Invalid tag'))
-        }
-      }
-
-      const normalEl = doc.createElement(this.name)
-      */
-    }
   }
 
   addTag(
@@ -282,7 +240,9 @@ const { BBCodeParser } = (function () {
       takesArgument: true,
       requiresContent: false,
       vanillaTag: false,
-      vanillizeTag: (content, arg) => `[url=${arg}]${content | 'Untitled Link'}[/url=img]`
+      /// TODO: load the url of the appropriate inline.
+      /// TODO: In fact, let's just resolve inlines to urls as soon as we're able.
+      vanillizeTag: (content, arg) => Number(arg) ? content : `[url=${arg}]${content | 'Untitled Link'}[/url=img]`
     }),
     new Tag('big', '<<c>>', { vanillaTag: false, vanillizeTag: (content) => `[i=big][/i]${content}[i=/big][/i]` }),
     new Tag('small', '>>c<<', { vanillaTag: false, vanillizeTag: (content) => `[i=small][/i]${content}[i=/small][/i]` }),

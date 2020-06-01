@@ -385,6 +385,7 @@ const { BBCodeParser } = (function () {
         if (match[MATCH.CLOSE]) {
           currentNode.lastChild.textContent = begin
           currentNode.parentNode.appendChild(this.dom.createTextNode(end))
+          currentNode = currentNode.parentNode
           regex.lastIndex = 0
           continue
         }
@@ -397,7 +398,9 @@ const { BBCodeParser } = (function () {
           const hackElTag = tags[match[MATCH.ARG].split('=')[0].replace('/', '').trim()]
           if (hackElTag) {
             const hackEl = this.dom.createElement(hackElTag.name)
-            if (hackElTag.properties.takesArgument) hackEl.setAttribute('arg', match[MATCH.ARG].split('=')[1].trim())
+            if (hackElTag.properties.takesArgument && match[MATCH.ARG].split('=')[1]) {
+              hackEl.setAttribute('arg', match[MATCH.ARG].split('=')[1].trim())
+            }
             if (hackElTag.properties.requiresClosing) {
               hackEl.setAttribute('hacktag-unhandled', true)
               hackEl.setAttribute('tag-close', match[MATCH.ARG].split('=')[0].trim()[0] === '/')
@@ -408,7 +411,7 @@ const { BBCodeParser } = (function () {
 
         // Add normal tag
         const normalEl = this.dom.createElement(tag.name)
-        if (match[MATCH.ARG]) normalEl.setAttribute('arg', match[MATCH.ARG])
+        if (tag.properties.takesArgument && match[MATCH.ARG]) normalEl.setAttribute('arg', match[MATCH.ARG])
         currentNode.appendChild(normalEl)
         currentNode = normalEl
         currentNode.appendChild(this.dom.createTextNode(end))
@@ -417,11 +420,10 @@ const { BBCodeParser } = (function () {
 
       // Fix pairs
       const pairSoloEls = (name) => {
-        this.dom.querySelectorAll(`[${name}-unhandled][tag-close=true]`).forEach(el => {
-          var sibling = el
+        this.dom.querySelectorAll(`[${name}-unhandled][tag-close=false]`).forEach(el => {
+          var sibling = el.nextElementSibling
           while (sibling) {
-            sibling = sibling.nextElementSibling
-            if (sibling.getAttribute('tag-close') && sibling.tagName === el.tagName) {
+            if (sibling.getAttribute('tag-close') === 'true' && sibling.tagName === el.tagName) {
               while (el.nextSibling !== sibling) {
                 el.appendChild(el.nextSibling)
               }
@@ -430,6 +432,7 @@ const { BBCodeParser } = (function () {
               el.removeAttribute('tag-close')
               break
             }
+            sibling = sibling.nextElementSibling
           }
         })
       }

@@ -82,5 +82,5 @@ window.bridge = {
       ctx.fillStyle = col
       return ctx.fillStyle
     }
-  )
+  ).BBCodeParser
 }

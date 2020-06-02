@@ -1,6 +1,8 @@
-#node
-
+#Don't commit nodejs modules
 /node_modules
 
-#local
+#Don't commit files explicitly meant to remain local
 /local
+
+#Don't commit coverage information (tests can be run locally)
+/coverage

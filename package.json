@@ -21,6 +21,7 @@
   "devDependencies": {
     "coveralls": "^3.1.0",
     "jest": "^26.0.1",
-    "jsdoc": "^3.6.4"
+    "jsdoc": "^3.6.4",
+    "jsdom": "^16.2.2"
   }
 }

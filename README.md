@@ -1,5 +1,7 @@
 # Fermion
 
+[![Code Style: Standard](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 Fermion is a third-party F-Chat client written in Electron. It's cross-platform and requires minimal effort to install and use.
 
 ## Features 

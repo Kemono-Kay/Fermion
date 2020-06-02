@@ -73,5 +73,14 @@ window.bridge = {
     rootElement.querySelectorAll('.Markup.Color').forEach(el => {
       el.style.color = `rgb(${el.getAttribute('data-col')})`
     })
-  }
+  },
+
+  BBCodeParser: require('./modules/BBCode.js')(
+    () => document.implementation.createDocument(null, 'root'),
+    col => {
+      const ctx = document.createElement('canvas').getContext('2d')
+      ctx.fillStyle = col
+      return ctx.fillStyle
+    }
+  )
 }

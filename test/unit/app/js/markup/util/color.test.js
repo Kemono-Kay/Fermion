@@ -1,15 +1,15 @@
 /* global describe, it, expect */
 
 const path = require('path')
-const color = require(path.join(process.cwd(), 'app', 'js', 'markup', 'util', 'color.js'))
+const { findClosestVanillaColor, findHSLColor } = require(path.join(process.cwd(), 'app', 'js', 'markup', 'util', 'color.js'))
 
 describe('The color utility module', () => {
   it('should have a \'findClosestVanillaColor\' function', () => {
-    expect(color.findClosestVanillaColor).toBeInstanceOf(Function)
+    expect(findClosestVanillaColor).toBeInstanceOf(Function)
   })
 
   it('should have a \'findHSLColor\' function', () => {
-    expect(color.findHSLColor).toBeInstanceOf(Function)
+    expect(findHSLColor).toBeInstanceOf(Function)
   })
 })
 
@@ -19,7 +19,7 @@ describe('The \'findHSLColor\' function', () => {
     [0, 255, 0, 120],
     [0, 0, 255, 240]
   ])('should resolve the hue of rgb(%i, %i, %i) to be ~%f', (r, g, b, expected) => {
-    expect(color.findHSLColor(r, g, b)[0]).toBeCloseTo(expected)
+    expect(findHSLColor(r, g, b)[0]).toBeCloseTo(expected)
   })
 
   it.each([
@@ -28,14 +28,14 @@ describe('The \'findHSLColor\' function', () => {
     [0, 255, 0, 100],
     [0, 0, 255, 100]
   ])('should resolve the saturation of rgb(%i, %i, %i) to be ~%f', (r, g, b, expected) => {
-    expect(color.findHSLColor(r, g, b)[1]).toBeCloseTo(expected)
+    expect(findHSLColor(r, g, b)[1]).toBeCloseTo(expected)
   })
 
   it.each([
     [255, 255, 255, 100],
     [0, 0, 0, 0]
   ])('should resolve the luminosity of rgb(%i, %i, %i) to be ~%f', (r, g, b, expected) => {
-    expect(color.findHSLColor(r, g, b)[2]).toBeCloseTo(expected)
+    expect(findHSLColor(r, g, b)[2]).toBeCloseTo(expected)
   })
 })
 
@@ -61,7 +61,7 @@ describe('The \'findClosestVanillaColor\' function', () => {
   ])('should return \'%s\'', (colName, colList) => {
     colList.forEach(a => a.unshift(colName))
     it.each(colList)('for a %sish color like rgb(%i, %i, %i)', (expected, r, g, b) => {
-      expect(color.findClosestVanillaColor(r, g, b)).toEqual(expected)
+      expect(findClosestVanillaColor(r, g, b)).toEqual(expected)
     })
   })
 
@@ -72,6 +72,6 @@ describe('The \'findClosestVanillaColor\' function', () => {
     [10, 10, {}],
     [10, 10, () => {}]
   ])('should return the sane fallback value \'black\' if given the invalid RGB value rgb(%o, %o, %o)', (r, g, b) => {
-    expect(color.findClosestVanillaColor(r, g, b)).toBe('black')
+    expect(findClosestVanillaColor(r, g, b)).toBe('black')
   })
 })

@@ -16,7 +16,14 @@ function setRange (...args) {
 /**
  * Vanilla colors for F-List.
  */
-const colors = {
+const vanillaColors = ['red', 'blue', 'white', 'yellow', 'pink', 'gray', 'green', 'orange', 'purple', 'black', 'brown', 'cyan']
+
+/**
+ * An object that carries the data for 'findClosestVanillaColor'.
+ * Order matters; if an earlier color matches, it's used over a later one that also matches.
+ * @see findClosestVanillaColor
+ */
+const closestColorRanges = {
   white: [setRange(true, [0, 10], [75, 100]), setRange(true, true, [95, 100])],
   gray: [setRange(true, [0, 10], [15, 75])],
   black: [setRange(true, [0, 10], [0, 15]), setRange(true, true, [0, 5])],
@@ -72,12 +79,13 @@ function findHSLColor (r, g, b) {
  * @param {Number} g - Green channel.
  * @param {Number} b - Blue channel.
  * @returns {String} The name of the matching color.
+ * @see closestColorRanges
  */
 function findClosestVanillaColor (r, g, b) {
   const col = findHSLColor(r, g, b)
-  for (const colName in colors) {
-    if (colors[colName].some(a => a.every((fn, i) => fn(col[i])))) return colName
+  for (const colName in closestColorRanges) {
+    if (closestColorRanges[colName].some(a => a.every((fn, i) => fn(col[i])))) return colName
   }
 }
 
-module.exports = { findClosestVanillaColor, findHSLColor }
+module.exports = { findClosestVanillaColor, findHSLColor, vanillaColors }

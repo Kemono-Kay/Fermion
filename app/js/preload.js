@@ -2,6 +2,11 @@
 
 const { ipcRenderer } = require('electron')
 const Awaiter = require('./Awaiter')
+const ruleList = require('./markup/util/ruleList')(col => {
+  const ctx = document.createElement('canvas').getContext('2d')
+  ctx.fillStyle = col
+  return ctx.fillStyle
+})
 
 // Dispatch FermionReadyEvent once all requirements have been met.
 const appReadyAwaiter = new Awaiter()
@@ -75,12 +80,10 @@ window.bridge = {
     })
   },
 
-  BBCodeParser: require('./modules/BBCode.js')(
-    () => document.implementation.createDocument(null, 'root'),
-    col => {
-      const ctx = document.createElement('canvas').getContext('2d')
-      ctx.fillStyle = col
-      return ctx.fillStyle
+  MarkupParser: class extends require('./markup/MarkupParser') {
+    constructor () {
+      super(() => document.implementation.createDocument(null, 'root'))
+      this.addMarkupRules(...ruleList)
     }
-  ).BBCodeParser
+  }
 }

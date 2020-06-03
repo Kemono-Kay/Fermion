@@ -12,6 +12,9 @@ class MarkupParser {
     this.errors = []
 
     this.markupRules = {}
+    this.contentRules = []
+    this.uselessChildren = []
+
     this.defaultSettings = {
       allowImages: true,
       parseHackTags: true,
@@ -26,13 +29,20 @@ class MarkupParser {
   addMarkupRules (...args) {
     args.forEach(rule => {
       this.markupRules[rule.name] = rule
+      if (rule.properties === undefined) throw rule
+      if (rule.properties.requiresContent && rule.properties.requiresClosing) {
+        this.contentRules.push(rule.name)
+      }
+      this.uselessChildren.push(...rule.properties.uselessChildren.filter(uc =>
+        !this.uselessChildren.includes(uc)))
     })
   }
 
   /**
    * Sets the DOM using a given BBCode string
-   * @param {*} str
-   * @param {*} settings
+   * @param {String} str - The string to parse
+   * @param {Object} settings - Extra rules to apply to parsing.
+   * @param {?Boolean} settings.parseHackTags - Whether to parse 'hack tags' into DOM elements
    */
   fromBBCode (str, settings = {}) {
     settings = { ...this.defaultSettings, ...settings }
@@ -40,7 +50,7 @@ class MarkupParser {
     this.errors = []
     var currentNode = this.dom.firstElementChild
     currentNode.appendChild(this.dom.createTextNode(str))
-    const regex = /\[ *?(\/?) *?([a-zA-Z_-]*?) *?(?:(?:=(.*?))?) *?\]/g
+    const regex = /\[ *?(\/?) *?([a-zA-Z0-9_-]*?) *?(?:(?:=(.*?))?) *?\]/g
 
     while (true) {
       const str = currentNode.lastChild.textContent
@@ -53,7 +63,8 @@ class MarkupParser {
       // Unknown tag
       if (!tag) {
         this.errors.push([`Unknown tag [${match[MATCH.NAME]}]`, currentNode])
-        currentNode.lastChild.textContent = begin
+        if (begin.length > 0) currentNode.lastChild.textContent = begin
+        else currentNode.lastChild.remove()
         try {
           const el = this.dom.createElement(match[MATCH.NAME])
           el.setAttribute('unknown-unhandled', true)
@@ -64,10 +75,10 @@ class MarkupParser {
           el.setAttribute('tag-close', Boolean(match[MATCH.CLOSE]))
           currentNode.appendChild(el)
         } catch (err) {
-          this.errors.push([`Invalid tag tag [${match[MATCH.NAME]}]`, currentNode])
-          currentNode.appendChild(this.dom.createTextNode(match[MATCH.NAME]))
+          this.errors.push([`Invalid tag ${match[MATCH.ALL]}`, currentNode])
+          currentNode.appendChild(this.dom.createTextNode(match[MATCH.ALL]))
         }
-        currentNode.appendChild(this.dom.createTextNode(str.slice(end)))
+        currentNode.appendChild(this.dom.createTextNode(end))
         regex.lastIndex = 0
         continue
       }
@@ -79,7 +90,8 @@ class MarkupParser {
 
       // Close vanilla/custom tags (not hack tags)
       if (match[MATCH.CLOSE]) {
-        currentNode.lastChild.textContent = begin
+        if (begin.length > 0) currentNode.lastChild.textContent = begin
+        else currentNode.lastChild.remove()
         currentNode.parentNode.appendChild(this.dom.createTextNode(end))
         currentNode = currentNode.parentNode
         regex.lastIndex = 0
@@ -87,7 +99,8 @@ class MarkupParser {
       }
 
       // Cut off text to insert new elements
-      currentNode.lastChild.textContent = begin
+      if (begin.length > 0) currentNode.lastChild.textContent = begin
+      else currentNode.lastChild.remove()
 
       // Find hack tag
       if (settings.parseHackTags && !tag.properties.takesArgument && match[MATCH.ARG]) {
@@ -109,7 +122,7 @@ class MarkupParser {
       const normalEl = this.dom.createElement(tag.name)
       if (tag.properties.takesArgument && match[MATCH.ARG]) normalEl.setAttribute('arg', match[MATCH.ARG])
       currentNode.appendChild(normalEl)
-      currentNode = normalEl
+      if (tag.properties.requiresClosing) currentNode = normalEl
       currentNode.appendChild(this.dom.createTextNode(end))
       regex.lastIndex = 0
     }
@@ -138,6 +151,28 @@ class MarkupParser {
     this.dom.querySelectorAll('[unknown-unhandled]').forEach(el => {
       el.after(this.dom.createTextNode(el.getAttribute('original-text')))
       el.remove()
+    })
+
+    // Remove useless contentless tags
+    ;[...this.dom.querySelectorAll(this.contentRules)].filter(el =>
+      el.textContent.length === 0).reverse().forEach(el => {
+      if ([...el.children].every(el => this.contentRules.includes(el.tagName))) {
+        ;[...el.childNodes].forEach(node => el.before(node))
+        el.remove()
+      }
+    })
+
+    // Remove useless child tags
+    this.dom.querySelectorAll(this.uselessChildren).forEach(el => {
+      var currentNode = el
+      while (currentNode.parentElement) {
+        currentNode = currentNode.parentElement
+        if (Object.values(this.markupRules).find(rule => rule.properties.uselessChildren.includes(currentNode.tagName))) {
+          ;[...el.childNodes].forEach(node => el.before(node))
+          el.remove()
+          break
+        }
+      }
     })
   }
 }

@@ -1,7 +1,7 @@
 /* global describe, it, expect */
 
 const path = require('path')
-const { findClosestVanillaColor, findHSLColor } = require(path.join(process.cwd(), 'app', 'js', 'markup', 'util', 'color.js'))
+const { findClosestVanillaColor, findHSLColor } = require(path.join(process.cwd(), 'app', 'js', 'markup', 'util', 'Color.js'))
 
 describe('The color utility module', () => {
   it('should have a \'findClosestVanillaColor\' function', () => {

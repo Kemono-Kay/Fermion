@@ -1,8 +1,8 @@
 /* eslint-env node, browser */
 
 const { ipcRenderer } = require('electron')
-const Awaiter = require('./Awaiter')
-const ruleList = require('./markup/util/ruleList')(col => {
+const Awaiter = require('./util/Awaiter')
+const ruleList = require('./markup/util/RuleList')(col => {
   const ctx = document.createElement('canvas').getContext('2d')
   ctx.fillStyle = col
   return ctx.fillStyle

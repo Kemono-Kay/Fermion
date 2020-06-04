@@ -1,6 +1,6 @@
 const MarkupRule = require('./../MarkupRule')
-const { findClosestVanillaColor, vanillaColors } = require('./color')
-const { validationRegex } = require('./url')
+const { findClosestVanillaColor, vanillaColors } = require('./Color')
+const { validationRegex } = require('./URL')
 
 /**
  * The ideal function for color standardisation exists only in the browser environment.

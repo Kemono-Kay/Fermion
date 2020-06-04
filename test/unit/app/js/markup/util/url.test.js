@@ -1,7 +1,7 @@
 /* global describe, it, expect */
 
 const path = require('path')
-const { validationRegex, domainRegex } = require(path.join(process.cwd(), 'app', 'js', 'markup', 'util', 'url.js'))
+const { validationRegex, domainRegex } = require(path.join(process.cwd(), 'app', 'js', 'markup', 'util', 'URL.js'))
 
 describe('The url validation regex', () => {
   it.each(

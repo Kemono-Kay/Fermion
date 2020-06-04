@@ -1,6 +1,5 @@
 /* eslint-env browser */
 /* eslint-disable no-unused-vars */
-/* global formatTimestamp */
 
 function fa (name, style = 's') {
   const el = document.createElement('span')

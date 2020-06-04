@@ -21,7 +21,8 @@ describe('The url domain regex', () => {
   // TODO: expand this list
   it.each([
     ['foo.com', 'http://foo.com/blah_blah'],
-    ['example.com', 'http://www.example.com/wpstyle/?p=364']
+    ['example.com', 'http://www.example.com/wpstyle/?p=364'],
+    ['foo.bar.baz.com', 'http://foo.bar.baz.com/;qux=quux']
   ])('should get the domain \'%s\' from the url \'%s\'', (domain, url) => {
     expect(domainRegex.exec(url)[1]).toEqual(domain)
   })

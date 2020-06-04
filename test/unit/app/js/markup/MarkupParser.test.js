@@ -10,7 +10,8 @@ const testMarkupRules = [
   new MarkupRule('bar', '[c]', { uselessChildren: ['bar'] }),
   new MarkupRule('baz', '!', { requiresClosing: false }),
   new MarkupRule('qux', '<c>', { vanillaTag: false }),
-  new MarkupRule('quux', '(a){c}', { takesArgument: true, handleClosingArg: handleClosingArg })
+  new MarkupRule('quux', '(a){c}', { takesArgument: true, handleClosingArg: handleClosingArg }),
+  new MarkupRule('quuz', '~~c~~', { requiresContent: false })
 ]
 
 beforeEach(() => {
@@ -85,6 +86,10 @@ describe('The \'fromBBCode\' funtion', () => {
     ['[bar]x[/bar][baz]', [
       ['bar', root => root.children[0].tagName],
       ['baz', root => root.children[1].tagName]
+    ]],
+    ['[bar][quuz][/quuz][/bar]', [
+      ['bar', root => root.children[0].tagName],
+      ['quuz', root => root.children[0].children[0].tagName]
     ]]
   ])('should parse %s into the DOM without change,', (bbcode, tests) => {
     const parser = new MarkupParser(initDOM)
@@ -151,6 +156,10 @@ describe('The \'fromBBCode\' funtion', () => {
       ['baz', root => root.children[0].children[0].tagName],
       ['bar', root => root.children[1].tagName],
       ['baz', root => root.children[1].children[0].tagName]
+    ]],
+    ['[bar=qux][/bar][bar=quuz][/bar][bar=/quuz][/bar][bar=/qux][/bar]', [
+      ['qux', root => root.children[0].tagName],
+      ['quuz', root => root.children[0].children[0].tagName]
     ]]
   ])('should NOT parse hack tags in %s into DOM tags if the \'parseHackTags\' rule is set to false,', (bbcode, tests) => {
     const parser = new MarkupParser(initDOM)

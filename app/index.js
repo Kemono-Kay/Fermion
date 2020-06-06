@@ -4,7 +4,8 @@ const electron = require('electron')
 const url = require('url')
 const path = require('path')
 const fs = require('fs')
-const Store = require('./js/fs/Store')
+// const Store = require('./js/fs/Store')
+const Storage = require('./js/fs/Storage')
 const Awaiter = require('./js/util/Awaiter')
 
 const { app, BrowserWindow, ipcMain, shell } = electron
@@ -19,10 +20,12 @@ appReadyAwaiter.add('load')
 appReadyAwaiter.add('appInit')
 appReadyAwaiter.run().then(() => {
   appWindow.webContents.send('windowstatus', 'part')
-  preferences.enqueue((data) => {
+  appWindow.webContents.send('preferences', preferences.getAll())
+  appWindow.show()
+  /* preferences.enqueue((data) => {
     appWindow.webContents.send('preferences', data)
     appWindow.show()
-  })
+  }) */
 }).catch(err => {
   console.error('Error occured during app launch:', err)
   app.exit(1)
@@ -129,10 +132,6 @@ socket.addEventListener('open', (...args) => {
 
 try {
   config = require(path.join(__dirname, 'platform', `${process.platform}.json`))
-  const str = config.appdata[0]
-  if (str[0] === '%' && str[str.length - 1] === '%') {
-    config.appdata[0] = process.env[str.slice(1, str.length - 1)]
-  }
 } catch (err) {
   console.error(`Platform ${process.platform} is not supported.`)
   process.exit(1)
@@ -141,7 +140,7 @@ try {
 async function initApp () {
   return new Promise((resolve, reject) => {
   // Create folders
-    const createFolder = async function (folder) {
+    /* const createFolder = async function (folder) {
       return new Promise((resolve, reject) => {
         fs.access(path.join(...config.appdata, 'fermion-client', folder), fs.constants.F_OK, (err) => {
           if (err) {
@@ -157,13 +156,13 @@ async function initApp () {
           }
         })
       })
-    }
+    } */
 
     // Load config
     const loadPreferences = async function () {
       return new Promise((resolve, reject) => {
         const defaultPath = path.join(__dirname, 'defaults', 'preferences.json')
-        const newPath = path.join(...config.appdata, 'fermion-client', 'config', 'preferences.json')
+        const newPath = path.join(process.cwd, 'data', 'config', 'preferences.json')
         fs.access(newPath, fs.constants.F_OK, (err) => {
           if (err) {
             // Preferences file inaccessible. Copy default file to location.
@@ -173,28 +172,30 @@ async function initApp () {
                 reject(err)
               } else {
                 // Copy successful.
-                preferences = new Store(newPath)
-                resolve()
+                preferences = new Storage()
+                preferences.load(newPath).then(resolve)
+                // new Store(newPath)
               }
             })
           } else {
             // Preferences file accessible. Create preferences object.
-            preferences = new Store(newPath)
-            resolve()
+            preferences = new Storage()
+            preferences.load(newPath).then(resolve)
+            // new Store(newPath)
           }
         })
       })
     }
 
-    Promise.all([
+    /* Promise.all([
       createFolder('logs'),
       createFolder('config'),
       createFolder('cache')
-    ]).then(() => {
-      loadPreferences().then(() => {
-        resolve()
-      }).catch(err => reject(err))
+    ]).then(() => { */
+    loadPreferences().then(() => {
+      resolve()
     }).catch(err => reject(err))
+    // }).catch(err => reject(err))
   })
 }
 

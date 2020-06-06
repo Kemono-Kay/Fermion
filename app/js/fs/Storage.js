@@ -53,7 +53,6 @@ class Storage {
       if (!this.writing) {
         this.handleQueue()
       }
-      // fs.promises.appendFile(this.filePath, `${key}=${value}`)
     }
   }
 
@@ -77,8 +76,13 @@ class Storage {
 
   remove (key, writeChange = true) {
     if (this.data[key]) {
-      this.data[key] = undefined
-      // see if this works at all
+      delete this.data[key]
+      if (writeChange) {
+        this.writeDirty = true
+        if (!this.writing) {
+          this.handleQueue()
+        }
+      }
     }
   }
 }

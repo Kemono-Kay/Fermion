@@ -5,7 +5,8 @@ const url = require('url')
 const path = require('path')
 const fs = require('fs')
 // const Store = require('./js/fs/Store')
-const Storage = require('./js/fs/Storage')
+// const Storage = require('./js/fs/Storage')
+const LocalStorage = require('node-localstorage')
 const Awaiter = require('./js/util/Awaiter')
 
 const { app, BrowserWindow, ipcMain, shell } = electron
@@ -20,7 +21,7 @@ appReadyAwaiter.add('load')
 appReadyAwaiter.add('appInit')
 appReadyAwaiter.run().then(() => {
   appWindow.webContents.send('windowstatus', 'part')
-  appWindow.webContents.send('preferences', preferences.getAll())
+  appWindow.webContents.send('preferences', preferences)
   appWindow.show()
   /* preferences.enqueue((data) => {
     appWindow.webContents.send('preferences', data)
@@ -172,16 +173,18 @@ async function initApp () {
                 reject(err)
               } else {
                 // Copy successful.
-                preferences = new Storage()
-                preferences.load(newPath).then(resolve)
+                // preferences = new Storage()
+                // preferences.load(newPath).then(resolve)
                 // new Store(newPath)
+                preferences = new LocalStorage(newPath, Infinity)
               }
             })
           } else {
             // Preferences file accessible. Create preferences object.
-            preferences = new Storage()
-            preferences.load(newPath).then(resolve)
+            // preferences = new Storage()
+            // preferences.load(newPath).then(resolve)
             // new Store(newPath)
+            preferences = new LocalStorage(newPath, Infinity)
           }
         })
       })

@@ -1,5 +1,5 @@
 class Channel {
-  constructor (store, address, title) {
+  constructor (storage, address, title) {
     this.messages = []
     this.settings = {
       logging: true,
@@ -8,7 +8,7 @@ class Channel {
 
     this.channel = address
     this.title = title || address
-    this.store = store
+    this.storage = storage
   }
 
   /**
@@ -23,9 +23,19 @@ class Channel {
     }
   }
 
+  async logAll () {
+    this.messages.filter(m => !m.logged).forEach(async m => this.log(m))
+  }
+
   log (message) {
-    this.store.update(message.serialize())
-    // TODO
+    const existingMsg = this.storage.getItem(message.timestamp)
+    if (existingMsg) {
+      const o = JSON.parse(existingMsg)
+      o.push(message.serialize())
+      this.storage.setItem(JSON.stringify(o))
+    } else {
+      this.storage.setItem(JSON.stringify([message.serialize()]))
+    }
   }
 }
 

@@ -1,12 +1,17 @@
 class Message {
-  constructor (messageDOM, timestamp = new Date().getTime()) {
+  constructor (messageDOM, user, timestamp = new Date().getTime()) {
     this.messageDOM = messageDOM
     this.timestamp = timestamp
+    this.user = user
     this.logged = false
   }
 
   serialize () {
-    return `${this.timestamp}:${this.messageDOM.firstElementChild.outerHTML}`
+    return JSON.stringify({ t: this.timestamp, d: this.messageDOM.firstElementChild.outerHTML, u: this.user })
+  }
+
+  static deserialize () {
+
   }
 }
 

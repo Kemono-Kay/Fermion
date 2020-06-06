@@ -175,6 +175,132 @@ class MarkupParser {
       }
     })
   }
+
+  /* getNextTag (str) {
+    var depth = 0
+    var index = 'pre'
+    var split = { pre: '', post: '', tag: '', arg: '' }
+    const copy = str
+
+    while (str) {
+      if (str[0] === '[') {
+        if (!depth++) str = str.slice(1)
+      }
+      if (str[0] === ']') {
+        if (!--depth) str = str.slice(1)
+      }
+      if (index === 'tag' && str[0] === '=') {
+        index = 'arg'
+        str = str.slice(1)
+      }
+
+      if (index === 'pre' && depth) {
+        index = 'tag'
+      }
+      if (index !== 'pre' && !depth) {
+        split.post = str
+        return split
+      }
+
+      split[index] += str[0]
+      str = str.slice(1)
+    }
+
+    return { pre: copy, post: '', tag: '', arg: '' }
+  } */
+
+  fromBBCodeNew (str, settings) {
+    settings = { ...this.defaultSettings, ...settings }
+    this.dom = this.createDocument()
+    this.errors = []
+
+    // This doesn't handle urls like http://[2001:db8:85a3:8d3:1319:8a2e:370:7348]/ yet.
+    // For that, it basically seems like I have to loop through, character by character, in order to match parentheses.
+    // Or perhaps I can correct it after? Seems like it could work, shifting unbalanced brackets into the argument...
+
+    // const parenthesisMatcher = //
+
+    const startNextTagRegex = new RegExp('\\[ *?(' + Object.values(this.markupRules).filter(rule => rule.properties.requiresClosing).split('|') + ') *?(?:=(.*?))? *?\\]([^]*)\\[ *?\\/ *?\\1 *?(?:=(.*?))? *?\\]', 'i')
+    // const unknownTagRegex = new RegExp('\\[ *?(\\/?) *?([a-z_][a-z0-9-_]*) *?(?:=(.*?))? *?\\]([^]*)\\[ *?\\/ *?\\2 *?(?:=(.*?))? *?\\]', 'i')
+    const unknownTagRegex = new RegExp('\\[ *?(\\/?) *?([a-z_][a-z0-9-_]*) *?(?:=(.*?))? *?\\]', 'i')
+
+    /**
+     * Parses BBCode into the DOM in a basic fashion.
+     * @param {String} str - Text to parse
+     * @param {HTMLElement} currentEl - Current element
+     * @returns {String} - Text left to parse
+     */
+    function parseTag (str, currentEl) {
+      const endCurrentTagRegex = new RegExp('\\[ *?\\/ *?(' + currentEl.tagName + ') *?(?:=(.*?))? *?\\]', 'i')
+      const end = endCurrentTagRegex.exec(str)
+      const start = startNextTagRegex.exec(str)
+
+      // If the closing tag is next, close the current tag
+      if (end && (!start || start.index > end.index)) {
+        currentEl.appendChild(this.dom.createTextNode(str.slice(0, end.index)))
+        if (settings.parseHackTags && end[2] && this.markupRules[end[1]]) {
+          this.markupRules[end[1]].properties.handleClosingArg(end[2], currentEl)
+        }
+        return str.slice(end.index + end[0].length)
+      }
+
+      // If an opening tag is next, open a new tag
+      if (start && (!end || end.index > start.index)) {
+        const el = this.dom.createElement(start[1])
+        if (start[2] && this.markupRules[start[1]].properties.takesArgument) el.setAttribute('arg', start[2])
+        if (start[2] && !this.markupRules[start[1]].properties.takesArgument) el.setAttribute('arg-unhandled', start[2])
+        currentEl.appendChild(this.dom.createTextNode(str.slice(0, start.index)))
+        currentEl.appendChild(el)
+        if (this.markupRules[start[1]].properties.requiresClosing) {
+          return parseTag(parseTag(str.slice(start.index + start[0].length), el), currentEl)
+        } else {
+          return parseTag(str.slice(start.index + start[0].length), currentEl)
+        }
+      }
+
+      // Parse unrecognised tags
+      const unknown = unknownTagRegex.exec(str)
+      if (unknown) {
+        const el = this.dom.createElement(unknown[2])
+        el.setAttribute('unknown-unhandled', true)
+        el.setAttribute('unknown', true)
+        el.setAttribute('original-text', unknown[0])
+        if (unknown[3]) el.setAttribute('tag-arg', unknown[3])
+        el.setAttribute('tag-close', Boolean(unknown[1]))
+        currentEl.appendChild(this.dom.createTextNode(str.slice(0, start.index)))
+        currentEl.appendChild(el)
+        return parseTag(str.slice(start.index + start[0].length), currentEl)
+      }
+
+      // Just append the current text if nothing else matches
+      currentEl.appendChild(this.dom.createTextNode(str))
+      return ''
+    }
+    parseTag(str, this.dom.firstElementChild)
+
+    // Handle hack tags
+    this.dom.firstElementChild.querySelectorAll('[arg-unhandled]').forEach(el => {
+      if (!/^ *?[a-z_][a-z0-9-_] */.test(el.getAttribute('arg-unhandled'))) return el.removeAttribute('arg-unhandled')
+      const name = el.getAttribute('arg-unhandled').split('=')[0].trim()
+      const arg = (el.getAttribute('arg-unhandled').split('=')[1] || '').trim()
+
+      var sibling = el.nextElementSibling
+      while (sibling) {
+        if (new RegExp('^ *?\\/ *?' + name).test(sibling.getAttribute('arg-unhandled'))) {
+          sibling.removeAttribute('arg-unhandled')
+          const newEl = this.dom.createElement(name)
+          if (arg && this.markupRules[name].properties.takesArgument) newEl.setAttribute('arg', arg)
+          el.before(newEl)
+          while (newEl.nextSibling !== sibling) {
+            newEl.appendChild(newEl.nextSibling)
+          }
+          sibling.remove()
+          break
+        }
+        sibling = sibling.nextElementSibling
+      }
+    })
+  }
 }
 
 module.exports = MarkupParser

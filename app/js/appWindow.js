@@ -13,9 +13,11 @@ function updateStyles () {
   document.firstElementChild.style.cssText = styleText
 }
 
-window.addEventListener('FermionPreferencesUpdated', () => {
-  styles['--fermion-scaling'] = window.bridge.preferences.fontsizes[window.bridge.preferences.fontsize]
-  updateStyles()
+window.addEventListener('FermionPreferencesUpdated', (e) => {
+  if (e.key[0] === 'fontsize') {
+    styles['--fermion-scaling'] = window.bridge.preferences.getItem(`fontsizes.${e.value}`)
+    updateStyles()
+  }
 })
 
 // Todo: Update upon being maximised or restored by dragging the window.

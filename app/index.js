@@ -4,9 +4,7 @@ const electron = require('electron')
 const url = require('url')
 const path = require('path')
 const fs = require('fs')
-// const Store = require('./js/fs/Store')
-// const Storage = require('./js/fs/Storage')
-const LocalStorage = require('node-localstorage')
+const { LocalStorage } = require('node-localstorage')
 const Awaiter = require('./js/util/Awaiter')
 
 const { app, BrowserWindow, ipcMain, shell } = electron
@@ -21,12 +19,7 @@ appReadyAwaiter.add('load')
 appReadyAwaiter.add('appInit')
 appReadyAwaiter.run().then(() => {
   appWindow.webContents.send('windowstatus', 'part')
-  appWindow.webContents.send('preferences', preferences)
   appWindow.show()
-  /* preferences.enqueue((data) => {
-    appWindow.webContents.send('preferences', data)
-    appWindow.show()
-  }) */
 }).catch(err => {
   console.error('Error occured during app launch:', err)
   app.exit(1)
@@ -139,66 +132,49 @@ try {
 }
 
 async function initApp () {
-  return new Promise((resolve, reject) => {
-  // Create folders
-    /* const createFolder = async function (folder) {
-      return new Promise((resolve, reject) => {
-        fs.access(path.join(...config.appdata, 'fermion-client', folder), fs.constants.F_OK, (err) => {
-          if (err) {
-            fs.mkdir(path.join(...config.appdata, 'fermion-client', folder), { recursive: true }, (err) => {
-              if (err) {
-                reject(err)
-              } else {
-                resolve()
-              }
-            })
-          } else {
-            resolve()
-          }
-        })
+  const createFolder = function (folder) {
+    return new Promise((resolve, reject) => {
+      fs.access(path.join(process.cwd(), 'data', folder), fs.constants.F_OK, (err) => {
+        if (err) {
+          fs.mkdir(path.join(process.cwd(), 'data', folder), { recursive: true }, (err) => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve()
+            }
+          })
+        } else {
+          resolve()
+        }
       })
-    } */
+    })
+  }
 
-    // Load config
-    const loadPreferences = async function () {
-      return new Promise((resolve, reject) => {
-        const defaultPath = path.join(__dirname, 'defaults', 'preferences.json')
-        const newPath = path.join(process.cwd, 'data', 'config', 'preferences.json')
-        fs.access(newPath, fs.constants.F_OK, (err) => {
-          if (err) {
-            // Preferences file inaccessible. Copy default file to location.
-            fs.copyFile(defaultPath, newPath, (err) => {
-              if (err) {
-                // Could not copy.
-                reject(err)
-              } else {
-                // Copy successful.
-                // preferences = new Storage()
-                // preferences.load(newPath).then(resolve)
-                // new Store(newPath)
-                preferences = new LocalStorage(newPath, Infinity)
-              }
-            })
-          } else {
-            // Preferences file accessible. Create preferences object.
-            // preferences = new Storage()
-            // preferences.load(newPath).then(resolve)
-            // new Store(newPath)
-            preferences = new LocalStorage(newPath, Infinity)
-          }
-        })
-      })
+  await Promise.all([
+    createFolder('logs'),
+    createFolder('config'),
+    createFolder('cache')
+  ])
+
+  const flatKeys = (o, p) => Object
+    .keys(o)
+    .map(i => typeof o[i] !== 'object' || o[i] === null
+      ? p
+        ? `${p}.${i}`
+        : i
+      : flatKeys(o[i], p
+        ? `${p}.${i}`
+        : i))
+    .flat()
+
+  const defaults = require(path.join(__dirname, 'defaults', 'preferences.json'))
+  const defaultKeys = flatKeys(defaults)
+  preferences = new LocalStorage(path.join(process.cwd(), 'data', 'config', 'preferences'), Infinity)
+
+  defaultKeys.forEach(key => {
+    if (preferences.getItem(key) === null) {
+      preferences.setItem(key, key.split('.').reduce((acc, cur) => acc[cur], defaults))
     }
-
-    /* Promise.all([
-      createFolder('logs'),
-      createFolder('config'),
-      createFolder('cache')
-    ]).then(() => { */
-    loadPreferences().then(() => {
-      resolve()
-    }).catch(err => reject(err))
-    // }).catch(err => reject(err))
   })
 }
 

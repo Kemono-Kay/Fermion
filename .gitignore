@@ -3,6 +3,7 @@
 
 #Don't commit files explicitly meant to remain local
 /local
+/data
 
 #Don't commit coverage information (tests can be run locally)
 /coverage

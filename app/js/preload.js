@@ -2,6 +2,8 @@
 
 const { ipcRenderer } = require('electron')
 const Awaiter = require('./util/Awaiter')
+const path = require('path')
+const { LocalStorage } = require('node-localstorage')
 const ruleList = require('./markup/util/RuleList')(col => {
   const ctx = document.createElement('canvas').getContext('2d')
   ctx.fillStyle = col
@@ -11,13 +13,18 @@ const ruleList = require('./markup/util/RuleList')(col => {
 // Dispatch FermionReadyEvent once all requirements have been met.
 const appReadyAwaiter = new Awaiter()
 appReadyAwaiter.add('windowstatusReady')
-appReadyAwaiter.add('preferencesReady')
 appReadyAwaiter.run().then(() => window.dispatchEvent(new Event('FermionReady')))
 
 // Communicate back to app that the page has loaded.
 window.addEventListener('load', () => {
   window.bridge.handleIcons()
   ipcRenderer.invoke('load')
+  for (var i = 0; i < preferences.length; i++) {
+    const e = new Event('FermionPreferencesUpdated')
+    e.key = preferences.key(i).split('.')
+    e.value = preferences.getItem(preferences.key(i))
+    window.dispatchEvent(e)
+  }
 }, { once: true })
 
 // Handle incoming events from the app.
@@ -27,26 +34,33 @@ ipcRenderer
     window.dispatchEvent(new Event('FermionWindowUpdated'))
     appReadyAwaiter.resolve('windowstatusReady')
   })
-  .on('preferences', (event, message) => {
-    window.bridge.preferences = message
-    window.dispatchEvent(new Event('FermionPreferencesUpdated'))
-    appReadyAwaiter.resolve('preferencesReady')
-  })
 
-// Handling commands
-/*  .on('servercommand', (event, message) => {
-    const evt = new Event('FermionCommand')
-    evt.commandData = Object.freeze({
-      type: message.slice(0, 3),
-      args: JSON.parse(message.slice(4) || '{}')
-    })
-    window.dispatchEvent(evt)
-  }) */
+// A simple wrapper to prevent potentially exposing unsafe variables and functions in the node-localstorage package.
+class Preferences {
+  constructor (path) {
+    const ls = new LocalStorage(path, Infinity)
+
+    this.setItem = (key, value) => {
+      const e = new Event('FermionPreferencesUpdated')
+      e.key = key.split('.')
+      e.value = value
+      ls.setItem(key, value)
+      window.dispatchEvent(e)
+    }
+
+    Object.defineProperty(this, 'length', { get: () => ls.length })
+    this.getItem = (k, v) => ls.getItem(k, v)
+    this.removeItem = (k) => ls.removeItem(k)
+    this.key = (k) => ls.key(k)
+    this.clear = () => ls.clear()
+  }
+}
+const preferences = new Preferences(path.join(process.cwd(), 'data', 'config', 'preferences'))
 
 // Export the app's interface with the Node backend to the window.
 window.bridge = {
   windowstatus: null,
-  preferences: null,
+  preferences: preferences,
   minimize: function () {
     ipcRenderer.invoke('window', 'minimize')
   },

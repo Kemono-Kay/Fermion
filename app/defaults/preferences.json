@@ -13,43 +13,43 @@
       "priority": 0
     },
     "Friend": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "Bookmark": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "Male": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "Female": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "Transgender": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "Herm": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "Shemale": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "Male-Herm": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "Cunt-boy": {
-      "color": null,
+      "color": "",
       "priority": 0
     },
     "None": {
-      "color": null,
+      "color": "",
       "priority": 0
     }
   }

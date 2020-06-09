@@ -1,18 +1,25 @@
-function treeNode (name, parent = null) {
-  const o = {
-    children: [],
-    parent,
-    name,
-    add: name => {
-      o.children.push(treeNode(name, o))
-      return o.children[o.children.length - 1]
-    },
-    addText: text => typeof o.children[o.children.length - 1] === 'string'
-      ? (o.children[o.children.length - 1] += text)
-      : o.children.push(text),
-    toString: () => o.children.map(n => n.toString()).join('')
+
+class TreeNode {
+  constructor (name, parent = null) {
+    this.children = []
+    this.parent = parent
+    this.name = name
   }
-  return o
+
+  add (name) {
+    this.children.push(new TreeNode(name, this))
+    return this.children[this.children.length - 1]
+  }
+
+  addText (text) {
+    return typeof this.children[this.children.length - 1] === 'string'
+      ? (this.children[this.children.length - 1] += text)
+      : this.children.push(text)
+  }
+
+  toString () {
+    return this.children.map(tn => tn.toString()).join('')
+  }
 }
 
 function tokenize (node, char) {
@@ -68,42 +75,94 @@ function tokenize (node, char) {
   return node
 }
 
-function parseBBCodeToTree (str) {
-  const tree = treeNode()
+function lex (str) {
+  const tree = new TreeNode()
   ;(str + '\0').split('').reduce(tokenize, tree)
   return tree
 }
 
-function parseTreeToTags (tree) {
+class Tag {
+  constructor (tagName, close, arg, originalText) {
+    this.tagName = tagName
+    this.close = close
+    this.arg = arg
+    this.originalText = originalText
+  }
+
+  toString () { return this.originalText }
+}
+
+function parse (tree) {
   return tree.children.map(node => {
     if (typeof node !== 'string') {
       var tagName = ''
       var close = node.name === 't-tag-close'
       var arg = null
+      var original = ''
       node.children.forEach(n => {
         if (typeof n === 'string') {
           tagName += n.trim()
         } else if (n.name === 't-arg') {
           arg = n.toString()
+          original += '='
         }
+        original += n
       })
-      node = { tagName, close, arg }
+      node = new Tag(tagName, close, arg, original)
     }
     return node
   })
 }
 
-function buildAST (node, tag) {
-  return node
+const contentRules = ['color', 'b']
+const knownRules = [...contentRules, 'hr']
+
+class MarkupNode {
+  constructor (openTag, closeTag) {
+    this.l = 0
+    this.close = closeTag ? null : openTag.close
+    this.argo = openTag.arg
+    this.argc = closeTag ? closeTag.arg : null
+    this.original = openTag.originalText
+    this.known = knownRules.includes(openTag.tagName)
+    this.children = []
+  }
+
+  setChildren (arr) {
+    this.children = arr
+    this.l = arr.length + arr.reduce((a, o) => a + (o.l || 1) - 1, 0)
+  }
+
+  getLength () { return this.l }
 }
 
-function parseTagsToAST (tags) {
-  const tree = treeNode()
-  tags.reduce(buildAST, tree)
-  return tree
-  // return tags
+function build (tags, currentTag = null) {
+  for (var i = 0; i < tags.length; i++) {
+    if (tags[i] instanceof Tag) {
+      if (tags[i].close) {
+        if (currentTag && currentTag.tagName === tags[i].tagName) {
+          return tags.slice(0, i + 1)
+        } else {
+          tags[i] = new MarkupNode(tags[i])
+          // tags[i] = `[${tags[i]}]`
+        }
+      } else if (contentRules.includes(tags[i].tagName)) {
+        const arr = build(tags.slice(i + 1), tags[i])
+        if (arr) {
+          const node = new MarkupNode(tags[i], arr.pop())
+          node.setChildren(arr)
+          tags.splice(i, node.getLength() + 2, node)
+        } else {
+          tags[i] = `[${tags[i]}]`
+        }
+      } else {
+        tags[i] = new MarkupNode(tags[i])
+      }
+    }
+  }
+  return currentTag ? null : tags
 }
 
 function parseBBCode (str) {
-  return parseTagsToAST(parseTreeToTags(parseBBCodeToTree(str)))
+  return build(parse(lex(str)))
 }

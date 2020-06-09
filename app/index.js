@@ -159,12 +159,8 @@ async function initApp () {
   const flatKeys = (o, p) => Object
     .keys(o)
     .map(i => typeof o[i] !== 'object' || o[i] === null
-      ? p
-        ? `${p}.${i}`
-        : i
-      : flatKeys(o[i], p
-        ? `${p}.${i}`
-        : i))
+      ? p ? `${p}.${i}` : i
+      : flatKeys(o[i], p ? `${p}.${i}` : i))
     .flat()
 
   const defaults = require(path.join(__dirname, 'defaults', 'preferences.json'))

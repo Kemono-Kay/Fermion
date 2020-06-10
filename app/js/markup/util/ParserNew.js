@@ -114,18 +114,41 @@ function parse (tree) {
   })
 }
 
+const argRules = ['color', 'hr']
 const contentRules = ['color', 'b']
 const knownRules = [...contentRules, 'hr']
 
 class MarkupNode {
   constructor (openTag, closeTag) {
     this.l = 0
+    this.children = []
+    this.rule = openTag.tagName
+    this.known = knownRules.includes(openTag.tagName)
+
+    /* if (openTag instanceof MarkupNode) {
+      this.close = openTag.close
+      this.argo = openTag.argo
+      this.argc = closeTag.argo
+      this.original = ''
+    } else { */
     this.close = closeTag ? null : openTag.close
     this.argo = openTag.arg
     this.argc = closeTag ? closeTag.arg : null
     this.original = openTag.originalText
-    this.known = knownRules.includes(openTag.tagName)
-    this.children = []
+    // }
+  }
+
+  static getHackTag (openNode, closeNode) {
+    const hackTag = (openNode.argo || openNode.argc).split('=')
+    const node = new MarkupNode({})
+    node.rule = hackTag.shift()
+    node.argo = hackTag.length ? hackTag.join('') : null
+    node.argc = (closeNode.argo || closeNode.argc)
+    node.argc = node.argc ? node.argc.split('=').slice(1).join('') : null
+    node.known = knownRules.includes(node.rule)
+    node.close = null
+    node.original = ''
+    return node
   }
 
   setChildren (arr) {
@@ -163,6 +186,28 @@ function build (tags, currentTag = null) {
   return currentTag ? null : tags
 }
 
-function parseBBCode (str) {
-  return build(parse(lex(str)))
+function getIndexOfClosingTag (array, tag = null) {
+  return array.reduce((a, v, i) => a !== -1 || typeof v === 'string' || v.close !== null || !v.known || (v.argo || v.argc).slice(0, tag.length) !== tag ? a : i, -1)
+}
+
+function parseHackTags (tree) {
+  for (var i = 0; i < tree.length; i++) {
+    if (tree[i] instanceof MarkupNode && !argRules.includes(tree[i].tagName) && (tree[i].argo || tree[i].argc) && /^[a-z0-9]/i.test(tree[i].argo || tree[i].argc)) {
+      const j = getIndexOfClosingTag(tree.slice(i + 1), '/' + (tree[i].argo || tree[i].argc).split('=')[0])
+      if (j !== -1) {
+        const node = MarkupNode.getHackTag(tree[i], tree[i + j + 1])
+        node.setChildren(tree.splice(i, j + 1, node))
+        const f = node.children.shift()
+        node.children = parseHackTags(node.children)
+        node.children.unshift(f)
+      }
+    }
+  }
+  return tree
+}
+
+function parseBBCode (str, hackTags = true) {
+  var tree = build(parse(lex(str)))
+  if (hackTags) tree = parseHackTags(tree)
+  return tree
 }

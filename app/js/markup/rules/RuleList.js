@@ -44,7 +44,7 @@ const rules = [
   new MarkupRule('color', '||a:c||', {
     takesArgument: true,
     validateArgAsVanilla: arg => vanillaColors.includes(arg),
-    vanillizeTag: (content, arg) => {
+    /* vanillizeTag: (content, arg) => {
       if (arg) {
         const col = [standardizeColor(arg)]
           .map(c => [c.slice(1, 3), c.slice(3, 5), c.slice(5, 7)]
@@ -53,13 +53,24 @@ const rules = [
         /* const closestColor = validVanillaColors[validVanillaColorValues
           .map(arr => [Math.abs(arr[0] - hsl[0]) * 0.9, Math.abs(arr[1] - hsl[1]) * 2.56, Math.abs(arr[2] - hsl[2]) * 2.56]
             .reduce((acc, cur) => acc + cur))
-          .reduce((acc, cur, i, a) => cur < a[acc] ? i : acc, 0)] */
+          .reduce((acc, cur, i, a) => cur < a[acc] ? i : acc, 0)] *
         const closestColor = findClosestVanillaColor(...col)
         return `[color=${closestColor}]${content}[/color=${arg}]`
       } else {
         return content
       }
-    },
+    }, */
+    /* vanillizeArg: (node) => {
+      if (node.arg[0]) {
+        node.arg[1] = node.arg[0]
+        const col = [standardizeColor(node.arg[0])]
+          .map(c => [c.slice(1, 3), c.slice(3, 5), c.slice(5, 7)]
+            .map(str => Number(`0x${str}`)))[0]
+        node.arg[0] = findClosestVanillaColor(...col)
+      } else {
+
+      }
+    }, */
     handleClosingArg (arg, node) {
       node.setAttribute('arg', arg)
       return node
@@ -72,18 +83,18 @@ const rules = [
   new MarkupRule('session', ['[a](#c)', '[](#c)'], { takesArgument: true, disallowedChildren: 'all', requiresContent: false }),
   new MarkupRule('li', ['\n+ c\n', '\n* c\n', '\n+[a] c\n', '\n*[a] c\n'], {
     takesArgument: true, // Number/character
-    vanillaTag: false,
-    vanillizeTag: (content, arg) => `[i=li${arg ? `=${arg}` : ''}][/i]${content}[i=/li][/i]`
+    vanillaTag: false
+    // vanillizeTag: (content, arg) => `[i=li${arg ? `=${arg}` : ''}][/i]${content}[i=/li][/i]`
   }),
   new MarkupRule('ol', '<[a]#  c  #>', {
     takesArgument: true, // Sequence of element numbers or keyword
-    vanillaTag: false,
-    vanillizeTag: (content, arg) => `[i=ol${arg ? `=${arg}` : ''}][/i]${content}[i=/ol][/i]`
+    vanillaTag: false
+    // vanillizeTag: (content, arg) => `[i=ol${arg ? `=${arg}` : ''}][/i]${content}[i=/ol][/i]`
   }),
   new MarkupRule('ul', '<[a]+  c  +>', {
     takesArgument: true, // List style
-    vanillaTag: false,
-    vanillizeTag: (content, arg) => `[i=ul${arg ? `=${arg}` : ''}][/i]${content}[i=/ul][/i]`
+    vanillaTag: false
+    // vanillizeTag: (content, arg) => `[i=ul${arg ? `=${arg}` : ''}][/i]${content}[i=/ul][/i]`
   }),
   new MarkupRule('img', '![c](a)', {
     disallowedChildren: 'all',
@@ -94,43 +105,43 @@ const rules = [
     /// TODO: In fact, let's just resolve inlines to urls as soon as we're able.
     vanillizeTag: (content, arg) => Number(arg) ? content : `[url=${arg}]${content | 'Untitled Link'}[/url=img]`
   }),
-  new MarkupRule('big', '<<c>>', { vanillaTag: false, vanillizeTag: (content) => `[i=big][/i]${content}[i=/big][/i]` }),
-  new MarkupRule('small', '>>c<<', { vanillaTag: false, vanillizeTag: (content) => `[i=small][/i]${content}[i=/small][/i]` }),
-  new MarkupRule('left', '|<<|  c  |<<|', { vanillaTag: false, vanillizeTag: (content) => `[i=left][/i]${content}[i=/left][/i]` }),
-  new MarkupRule('right', '|>>|  c  |>>|', { vanillaTag: false, vanillizeTag: (content) => `[i=right][/i]${content}[i=/right][/i]` }),
-  new MarkupRule('center', '|><|  c  |><|', { vanillaTag: false, vanillizeTag: (content) => `[i=center][/i]${content}[i=/center][/i]` }),
+  new MarkupRule('big', '<<c>>', { vanillaTag: false /* vanillizeTag: (content) => `[i=big][/i]${content}[i=/big][/i]` */ }),
+  new MarkupRule('small', '>>c<<', { vanillaTag: false /* vanillizeTag: (content) => `[i=small][/i]${content}[i=/small][/i]` */ }),
+  new MarkupRule('left', '|<<|  c  |<<|', { vanillaTag: false /* vanillizeTag: (content) => `[i=left][/i]${content}[i=/left][/i]` */ }),
+  new MarkupRule('right', '|>>|  c  |>>|', { vanillaTag: false /* vanillizeTag: (content) => `[i=right][/i]${content}[i=/right][/i]` */ }),
+  new MarkupRule('center', '|><|  c  |><|', { vanillaTag: false /* vanillizeTag: (content) => `[i=center][/i]${content}[i=/center][/i]` */ }),
   new MarkupRule('justify', '|<a>|  c  |<>|', {
     vanillaTag: false,
-    takesArgument: true,
-    vanillizeTag: (content, arg) => `[i=justify${arg ? `=${arg}` : ''}][/i]${content}[i=/justify][/i]`
+    takesArgument: true
+    /* vanillizeTag: (content, arg) => `[i=justify${arg ? `=${arg}` : ''}][/i]${content}[i=/justify][/i]` */
   }),
-  new MarkupRule('code', ['`c`', '```a\nc```'], { vanillaTag: false, disallowedChildren: 'all', takesArgument: true, vanillizeTag: (content, arg) => `[i=code${arg ? `=${arg}` : ''}][/i]${content}[i=/code][/i]` }),
+  new MarkupRule('code', ['`c`', '```a\nc```'], { vanillaTag: false, disallowedChildren: 'all', takesArgument: true /* vanillizeTag: (content, arg) => `[i=code${arg ? `=${arg}` : ''}][/i]${content}[i=/code][/i]` */ }),
   /*
     possibly table, too
     */
   // Profile parsing, not implemented
-  new MarkupRule('heading', '\n#c', { vanillaTag: false, vanillizeTag: (content) => `[i=heading][/i]${content}[i=/heading][/i]` }),
+  new MarkupRule('heading', '\n#c', { vanillaTag: false /* vanillizeTag: (content) => `[i=heading][/i]${content}[i=/heading][/i]` */ }),
   new MarkupRule('collapse', ['[a]{c}', '[]{c}'], {
     vanillaTag: false,
     requiresContent: false,
-    takesArgument: true,
-    vanillizeTag: (content, arg) => `[i=collapse${arg ? `=${arg}` : ''}][/i]${content}[i=/collapse][/i]`
+    takesArgument: true
+    // vanillizeTag: (content, arg) => `[i=collapse${arg ? `=${arg}` : ''}][/i]${content}[i=/collapse][/i]`
   }),
   new MarkupRule('quote', [' > c', '\n> c', ' >[a] c', '\n>[a] c'], {
     vanillaTag: false,
-    takesArgument: true,
-    vanillizeTag: (content, arg) => `[i=quote${arg ? `=${arg}` : ''}][/i]${content}[i=/quote][/i]`
+    takesArgument: true
+    // vanillizeTag: (content, arg) => `[i=quote${arg ? `=${arg}` : ''}][/i]${content}[i=/quote][/i]`
   }), // > x
   new MarkupRule('indent', [], {
     vanillaTag: false,
-    takesArgument: true,
-    vanillizeTag: (content, arg) => `[i=indent${arg ? `=${arg}` : ''}][/i]${content}[i=/indent][/i]`
+    takesArgument: true
+    // vanillizeTag: (content, arg) => `[i=indent${arg ? `=${arg}` : ''}][/i]${content}[i=/indent][/i]`
   }), // TODO: if alignment switches to right, indent on the right side. Justify/center goes both ways.
   new MarkupRule('hr', [], {
     vanillaTag: false,
     takesArgument: true,
-    requiresClosing: false,
-    vanillizeTag: (arg) => `[i=hr${arg ? `=${arg}` : ''}][/i]`
+    requiresClosing: false
+    // vanillizeTag: (arg) => `[i=hr${arg ? `=${arg}` : ''}][/i]`
   }) // ---, ***, - - -, * * *, etc.
 ]
 

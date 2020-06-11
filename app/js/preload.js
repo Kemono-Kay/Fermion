@@ -4,11 +4,11 @@ const { ipcRenderer } = require('electron')
 const Awaiter = require('./util/Awaiter')
 const path = require('path')
 const { LocalStorage } = require('node-localstorage')
-const ruleList = require('./markup/util/RuleList')(col => {
+/* const ruleList = require('./markup/util/RuleList')(col => {
   const ctx = document.createElement('canvas').getContext('2d')
   ctx.fillStyle = col
   return ctx.fillStyle
-})
+}) */
 
 // Dispatch FermionReadyEvent once all requirements have been met.
 const appReadyAwaiter = new Awaiter()
@@ -94,10 +94,11 @@ window.bridge = {
     })
   },
 
-  MarkupParser: class extends require('./markup/MarkupParser') {
+  /* MarkupParser: class extends require('./markup/MarkupParser') {
     constructor () {
       super(() => document.implementation.createDocument(null, 'root'))
       this.addMarkupRules(...ruleList)
     }
-  }
+  } */
+  IntermediateMarkupTree: require('./markup/IntermediateMarkupTree')
 }

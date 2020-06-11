@@ -163,7 +163,6 @@ function build (tags, currentTag = null) {
           return tags.slice(0, i + 1)
         } else {
           tags[i] = new MarkupNode(tags[i])
-          // tags[i] = `[${tags[i]}]`
         }
       } else if (closeRules.includes(tags[i].tagName)) {
         const arr = build(tags.slice(i + 1), tags[i])
@@ -186,7 +185,6 @@ function getIndexOfClosingHackTag (array, tag = null) {
   return array.reduce((a, v, i) => a !== -1 || typeof v === 'string' || v.close !== null || !v.known || (v.argo || v.argc).slice(0, tag.length) !== tag ? a : i, -1)
 }
 
-// TODO make it work from the middle outwards
 function parseHackTags (tree) {
   for (var i = 0; i < tree.length; i++) {
     if (tree[i] instanceof MarkupNode && !argRules.includes(tree[i].tagName) && (tree[i].argo || tree[i].argc) && /^[a-z0-9]/i.test(tree[i].argo || tree[i].argc)) {
@@ -208,20 +206,22 @@ function getIndexOfClosingTag (array, tag = null) {
   return array.reduce((a, v, i) => a !== -1 || typeof v === 'string' || v.close !== true || v.rule !== tag ? a : i, -1)
 }
 
-// TODO make it work from the middle outwards
 function parseUnknownTags (tree) {
   for (var i = 0; i < tree.length; i++) {
-    if (tree[i] instanceof MarkupNode && !tree[i].known && tree[i].close === false) {
-      tree.splice(i + 1, 0, ...parseUnknownTags(tree.splice(i + 1)))
-      const j = getIndexOfClosingTag(tree.slice(i + 1), tree[i].rule)
-      if (j !== -1) {
-        tree[i].setChildren(tree.splice(i + 1, j))
-        tree[i].argc = tree.splice(i + 1, 1)[0].argo
-        tree[i].close = null
-      }
-    }
     if (tree[i] instanceof MarkupNode) {
-      tree[i].setChildren(parseUnknownTags(tree[i].children))
+      if (!tree[i].known && tree[i].close === false) {
+        tree.splice(i + 1, 0, ...parseUnknownTags(tree.splice(i + 1)))
+        const j = getIndexOfClosingTag(tree.slice(i + 1), tree[i].rule)
+        if (j !== -1) {
+          tree[i].setChildren(tree.splice(i + 1, j))
+          tree[i].argc = tree.splice(i + 1, 1)[0].argo
+          tree[i] = new IntermediateNode(tree[i])
+        } else {
+          tree[i] = `[${tree[i].original}]`
+        }
+      } else {
+        tree[i] = new IntermediateNode(tree[i])
+      }
     }
   }
   return tree
@@ -230,7 +230,7 @@ function parseUnknownTags (tree) {
 class IntermediateNode {
   constructor (markupNode) {
     this.children = markupNode.children
-    this.ruleName = markupNode.rule
+    this.ruleName = markupNode.rule.toLowerCase()
     this.arg = [markupNode.argo, markupNode.argc]
     this.original = [markupNode.original, markupNode.originalc]
     this.known = markupNode.known
@@ -252,26 +252,45 @@ class IntermediateNode {
   }
 }
 
-function removeUnknownAndEmptyTags (tree) {
-  for (var i = 0; i < tree.length; i++) {
-    if (tree[i] instanceof MarkupNode) {
-      tree[i].setChildren(removeUnknownAndEmptyTags(tree[i].children))
-      if (tree[i].close !== null && !tree[i].known) {
-        tree[i] = `[${tree[i].original}]`
-      } else if (tree[i].children.length === 0 && !contentNotRequiredRules.includes(tree[i].rule.toLowerCase())) {
-        tree.splice(i, 1)
-      } else {
-        tree[i] = new IntermediateNode(tree[i])
+class IntermediateMarkupTree {
+  constructor (settings) {
+    this.settings = {
+      parseHackTags: true,
+      swallowUnknownTags: true,
+      ...settings
+    }
+    this.tree = []
+  }
+
+  static fromBBCode (str, settings = {}) {
+    const imt = new this(settings)
+
+    var tree = build(parse(lex(str)))
+    if (settings.parseHackTags) tree = parseHackTags(tree)
+    imt.tree = parseUnknownTags(tree)
+    // require('./parser/BBCodeParser')(str, settings)
+    imt.cleantree(imt.tree)
+    return imt
+  }
+
+  cleantree (tree) {
+    for (var i = 0; i < tree.length; i++) {
+      if (tree[i] instanceof IntermediateNode) {
+        this.cleantree(tree[i].children)
+        if (tree[i].children.length === 0 && !contentNotRequiredRules.includes(tree[i].ruleName)) { tree.splice(i, 1) }
       }
     }
   }
-  return tree
+
+  serialize () {
+    return JSON.stringify(this.tree)
+  }
+
+  static deserialize (str, settings = {}) {
+    const imt = new this(settings)
+    imt.tree = JSON.parse(str)
+    return imt
+  }
 }
 
-function parseBBCode (str, hackTags = true) {
-  var tree = build(parse(lex(str)))
-  if (hackTags) tree = parseHackTags(tree)
-  tree = parseUnknownTags(tree)
-  tree = removeUnknownAndEmptyTags(tree)
-  return tree
-}
+module.exports = IntermediateMarkupTree

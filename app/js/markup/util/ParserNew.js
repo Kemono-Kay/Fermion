@@ -1,4 +1,3 @@
-
 class TreeNode {
   constructor (name, parent = null) {
     this.children = []
@@ -115,8 +114,10 @@ function parse (tree) {
 }
 
 const argRules = ['color', 'hr']
-const contentRules = ['color', 'b']
-const knownRules = [...contentRules, 'hr']
+const contentNotRequiredRules = ['session', 'img', 'collapse', 'hr']
+const closeRules = ['color', 'b', 'i', 'url', 'session', 'img', 'collapse']
+const knownRules = [...closeRules, 'hr']
+const vanillaRules = ['color', 'b', 'i', 'url', 'session']
 
 class MarkupNode {
   constructor (openTag, closeTag) {
@@ -125,17 +126,11 @@ class MarkupNode {
     this.rule = openTag.tagName
     this.known = knownRules.includes(openTag.tagName)
 
-    /* if (openTag instanceof MarkupNode) {
-      this.close = openTag.close
-      this.argo = openTag.argo
-      this.argc = closeTag.argo
-      this.original = ''
-    } else { */
     this.close = closeTag ? null : openTag.close
     this.argo = openTag.arg
     this.argc = closeTag ? closeTag.arg : null
     this.original = openTag.originalText
-    // }
+    this.originalc = closeTag ? closeTag.originalText : null
   }
 
   static getHackTag (openNode, closeNode) {
@@ -147,7 +142,8 @@ class MarkupNode {
     node.argc = node.argc ? node.argc.split('=').slice(1).join('') : null
     node.known = knownRules.includes(node.rule)
     node.close = null
-    node.original = ''
+    node.original = `[${node.rule}${node.argo ? `=${node.argo}` : ''}]`
+    node.originalc = `[/${node.rule}${node.argc ? `=${node.argc}` : ''}]`
     return node
   }
 
@@ -169,7 +165,7 @@ function build (tags, currentTag = null) {
           tags[i] = new MarkupNode(tags[i])
           // tags[i] = `[${tags[i]}]`
         }
-      } else if (contentRules.includes(tags[i].tagName)) {
+      } else if (closeRules.includes(tags[i].tagName)) {
         const arr = build(tags.slice(i + 1), tags[i])
         if (arr) {
           const node = new MarkupNode(tags[i], arr.pop())
@@ -186,14 +182,16 @@ function build (tags, currentTag = null) {
   return currentTag ? null : tags
 }
 
-function getIndexOfClosingTag (array, tag = null) {
+function getIndexOfClosingHackTag (array, tag = null) {
   return array.reduce((a, v, i) => a !== -1 || typeof v === 'string' || v.close !== null || !v.known || (v.argo || v.argc).slice(0, tag.length) !== tag ? a : i, -1)
 }
 
+// TODO make it work from the middle outwards
 function parseHackTags (tree) {
   for (var i = 0; i < tree.length; i++) {
     if (tree[i] instanceof MarkupNode && !argRules.includes(tree[i].tagName) && (tree[i].argo || tree[i].argc) && /^[a-z0-9]/i.test(tree[i].argo || tree[i].argc)) {
-      const j = getIndexOfClosingTag(tree.slice(i + 1), '/' + (tree[i].argo || tree[i].argc).split('=')[0])
+      tree.splice(i + 1, 0, ...parseHackTags(tree.splice(i + 1)))
+      const j = getIndexOfClosingHackTag(tree.slice(i + 1), '/' + (tree[i].argo || tree[i].argc).split('=')[0])
       if (j !== -1) {
         const node = MarkupNode.getHackTag(tree[i], tree[i + j + 1])
         node.setChildren(tree.splice(i, j + 1, node))
@@ -206,8 +204,74 @@ function parseHackTags (tree) {
   return tree
 }
 
+function getIndexOfClosingTag (array, tag = null) {
+  return array.reduce((a, v, i) => a !== -1 || typeof v === 'string' || v.close !== true || v.rule !== tag ? a : i, -1)
+}
+
+// TODO make it work from the middle outwards
+function parseUnknownTags (tree) {
+  for (var i = 0; i < tree.length; i++) {
+    if (tree[i] instanceof MarkupNode && !tree[i].known && tree[i].close === false) {
+      tree.splice(i + 1, 0, ...parseUnknownTags(tree.splice(i + 1)))
+      const j = getIndexOfClosingTag(tree.slice(i + 1), tree[i].rule)
+      if (j !== -1) {
+        tree[i].setChildren(tree.splice(i + 1, j))
+        tree[i].argc = tree.splice(i + 1, 1)[0].argo
+        tree[i].close = null
+      }
+    }
+    if (tree[i] instanceof MarkupNode) {
+      tree[i].setChildren(parseUnknownTags(tree[i].children))
+    }
+  }
+  return tree
+}
+
+class IntermediateNode {
+  constructor (markupNode) {
+    this.children = markupNode.children
+    this.ruleName = markupNode.rule
+    this.arg = [markupNode.argo, markupNode.argc]
+    this.original = [markupNode.original, markupNode.originalc]
+    this.known = markupNode.known
+  }
+
+  toBBCode (settings = { swallowUnknownTags: true, parseHackTags: true }) {
+    const content = this.children.map(c => c instanceof IntermediateNode ? c.toBBCode(settings) : c).join('')
+    if (settings.swallowUnknownTags && !knownRules.includes(this.ruleName)) {
+      return content
+    } else if (settings.parseHackTags && !vanillaRules.includes(this.ruleName)) {
+      return `[i=${this.ruleName}${this.arg[0] ? `=${this.arg[0]}` : ''}][/i]${content}[i=/${this.ruleName}${this.arg[1] ? `=${this.arg[1]}` : ''}][/i]`
+    } else {
+      return `[${this.ruleName}${this.arg[0] ? `=${this.arg[0]}` : ''}]${content}[/${this.ruleName}${this.arg[1] ? `=${this.arg[1]}` : ''}]`
+    }
+  }
+
+  static toBBCode (array, settings = { swallowUnknownTags: true, parseHackTags: true }) {
+    return array.map(c => c instanceof IntermediateNode ? c.toBBCode(settings) : c).join('')
+  }
+}
+
+function removeUnknownAndEmptyTags (tree) {
+  for (var i = 0; i < tree.length; i++) {
+    if (tree[i] instanceof MarkupNode) {
+      tree[i].setChildren(removeUnknownAndEmptyTags(tree[i].children))
+      if (tree[i].close !== null && !tree[i].known) {
+        tree[i] = `[${tree[i].original}]`
+      } else if (tree[i].children.length === 0 && !contentNotRequiredRules.includes(tree[i].rule.toLowerCase())) {
+        tree.splice(i, 1)
+      } else {
+        tree[i] = new IntermediateNode(tree[i])
+      }
+    }
+  }
+  return tree
+}
+
 function parseBBCode (str, hackTags = true) {
   var tree = build(parse(lex(str)))
   if (hackTags) tree = parseHackTags(tree)
+  tree = parseUnknownTags(tree)
+  tree = removeUnknownAndEmptyTags(tree)
   return tree
 }

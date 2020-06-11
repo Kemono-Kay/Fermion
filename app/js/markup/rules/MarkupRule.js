@@ -42,7 +42,7 @@ class MarkupRule {
       vanillaTag: true,
       validateArgAsVanilla: () => true,
       vanillizeTag: (c, a) => `[i=${tagName}${a ? `=${a}` : ''}][/i]${c}[i=/${tagName}][/i]`,
-      handleClosingArg: (_, n) => n,
+      handleClosingArg: () => {}, // (_, n) => n,
       ...properties
     }
   }

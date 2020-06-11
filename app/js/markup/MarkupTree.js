@@ -9,7 +9,7 @@ const parse = {
 }
 
 const print = {
-  bbcode: MarkupNode.toBBCode,
+  bbcode: (tree, settings) => tree.map(t => require('./bbcode/Unparser').unparse(t, settings)).join(''),
   md: MarkupNode.toMD,
   html: MarkupNode.toHTML,
   json: JSON.parse
@@ -35,7 +35,7 @@ class MarkupTree {
   }
 
   to (kind, settings) {
-    return print[kind](this.tree, kind, { ...this.settings, ...settings })
+    return print[kind](this.tree, { ...this.settings, ...settings })
   }
 
   /* toBBCode (settings) {

@@ -113,6 +113,10 @@ function parseHackTags (tree) {
         const f = node.children.shift()
         node.children = parseHackTags(node.children)
         node.children.unshift(f)
+      } else if (Object.keys(closingRequiredRules).includes((tree[i].argo || tree[i].argc).split('=')[0])) {
+        const node = new TagNode({ tagName: (tree[i].argo || tree[i].argc).split('=')[0] })
+        node.close = null
+        tree.splice(i++, 0, node)
       }
     }
   }
@@ -129,11 +133,13 @@ function parseUnknownTags (tree) {
           tree[i].setChildren(tree.splice(i + 1, j))
           tree[i].argc = tree.splice(i + 1, 1)[0].argo
           tree[i] = new MarkupNode(tree[i])
+          validRules[tree[i].tagName].handleClosingArgs(tree[i])
         } else {
           tree[i] = `[${tree[i].original}]`
         }
       } else {
         tree[i] = new MarkupNode(tree[i])
+        validRules[tree[i].tagName].handleClosingArgs(tree[i])
       }
     }
   }

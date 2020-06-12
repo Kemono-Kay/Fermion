@@ -4,25 +4,29 @@ function unparse (node, settings) {
   if (typeof node === 'string') {
     return node
   } else {
-    const content = this.children.map(n => unparse(n, settings))
+    const content = node.children.map(n => unparse(n, settings)).join('')
     if (!node.known) {
       if (settings.swallowUnknownTags) {
         return content
       } else {
         return `${node.original[0]}${content}${node.original[1]}`
       }
-    } else if (!validRules[this.ruleName].properties.takesArgument) {
+    }
+
+    if (!validRules[node.ruleName].properties.takesArgument) {
       node.arg[0] = null
       node.arg[1] = null
-    } else if (settings.parseHackTags && !vanillaRules[this.ruleName]) {
-      return validRules[this.ruleName].vanillizeTag(content, node.arg[0])
+    }
+
+    if (settings.parseHackTags && !vanillaRules[node.ruleName]) {
+      return validRules[node.ruleName].properties.vanillizeTag(content, node.arg[0])
     } else {
-      if (validRules[this.ruleName].properties.validateArgAsVanilla(node.arg[0])) {
-        return `[${this.ruleName}${this.arg[0] ? `=${this.arg[0]}` : ''}]${
+      if (validRules[node.ruleName].properties.validateArgAsVanilla(node.arg[0])) {
+        return `[${node.ruleName}${node.arg[0] ? `=${node.arg[0]}` : ''}]${
           content
-        }[/${this.ruleName}${this.arg[1] ? `=${this.arg[1]}` : ''}]`
+        }[/${node.ruleName}${node.arg[1] ? `=${node.arg[1]}` : ''}]`
       } else {
-        return validRules[this.ruleName].vanillizeTag(content, node.arg[0])
+        return validRules[node.ruleName].properties.vanillizeTag(content, node.arg[0])
       }
     }
   }

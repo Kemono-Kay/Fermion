@@ -133,13 +133,15 @@ function parseUnknownTags (tree) {
           tree[i].setChildren(tree.splice(i + 1, j))
           tree[i].argc = tree.splice(i + 1, 1)[0].argo
           tree[i] = new MarkupNode(tree[i])
-          validRules[tree[i].tagName].handleClosingArgs(tree[i])
+          validRules[tree[i].ruleName].properties.handleClosingArg(tree[i])
+          tree[i].children = parseUnknownTags(tree[i].children)
         } else {
           tree[i] = `[${tree[i].original}]`
         }
       } else {
         tree[i] = new MarkupNode(tree[i])
-        validRules[tree[i].tagName].handleClosingArgs(tree[i])
+        if (tree[i].known) validRules[tree[i].ruleName].properties.handleClosingArg(tree[i])
+        tree[i].children = parseUnknownTags(tree[i].children)
       }
     }
   }

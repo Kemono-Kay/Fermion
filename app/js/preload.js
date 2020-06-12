@@ -100,5 +100,5 @@ window.bridge = {
       this.addMarkupRules(...ruleList)
     }
   } */
-  IntermediateMarkupTree: require('./markup/IntermediateMarkupTree')
+  MarkupTree: require('./markup/MarkupTree')
 }

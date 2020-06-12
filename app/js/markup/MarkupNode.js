@@ -1,11 +1,11 @@
 
 class MarkupNode {
-  constructor (markupNode) {
-    this.children = markupNode.children
-    this.ruleName = markupNode.rule.toLowerCase()
-    this.arg = [markupNode.argo, markupNode.argc]
-    this.original = [markupNode.original, markupNode.originalc]
-    this.known = markupNode.known
+  constructor (ruleNode) {
+    this.children = ruleNode.children
+    this.ruleName = ruleNode.rule.toLowerCase()
+    this.arg = [ruleNode.argo, ruleNode.argc]
+    this.original = [ruleNode.original, ruleNode.originalc]
+    this.known = ruleNode.known
   }
 
   /* toMD (settings) {

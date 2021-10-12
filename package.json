@@ -15,7 +15,7 @@
   "license": "MITNFA",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.0",
-    "electron": "^9.0.0",
+    "electron": "^11.5.0",
     "node-localstorage": "^2.1.6",
     "ws": "^7.3.0"
   },
